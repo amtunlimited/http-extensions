@@ -5,8 +5,8 @@
 HTTP Working Group                                                K. Oku
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                               L. Pardue
-Expires: January 4, 2021                                      Cloudflare
-                                                           July 03, 2020
+Expires: January 9, 2021                                      Cloudflare
+                                                           July 08, 2020
 
 
                Extensible Prioritization Scheme for HTTP
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 1]
+Oku & Pardue             Expires January 9, 2021                [Page 1]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -61,7 +61,7 @@ Internet-Draft               HTTP Priorities                   July 2020
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 4, 2021.
+   This Internet-Draft will expire on January 9, 2021.
 
 Copyright Notice
 
@@ -98,23 +98,22 @@ Table of Contents
        7.1.1.  Coalescing Intermediaries . . . . . . . . . . . . . .  12
        7.1.2.  HTTP/1.x Back Ends  . . . . . . . . . . . . . . . . .  13
        7.1.3.  Intentional Introduction of Unfairness  . . . . . . .  14
-   8.  Considerations  . . . . . . . . . . . . . . . . . . . . . . .  14
-     8.1.  Why use an End-to-End Header Field? . . . . . . . . . . .  14
+   8.  Why use an End-to-End Header Field? . . . . . . . . . . . . .  14
    9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  15
      10.2.  Informative References . . . . . . . . . . . . . . . . .  16
      10.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  17
    Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  17
+   Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  17
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 2]
+Oku & Pardue             Expires January 9, 2021                [Page 2]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
 
-   Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  17
      B.1.  Since draft-kazuho-httpbis-priority-04  . . . . . . . . .  18
      B.2.  Since draft-kazuho-httpbis-priority-03  . . . . . . . . .  18
      B.3.  Since draft-kazuho-httpbis-priority-02  . . . . . . . . .  18
@@ -165,7 +164,8 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 3]
+
+Oku & Pardue             Expires January 9, 2021                [Page 3]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -221,7 +221,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 4]
+Oku & Pardue             Expires January 9, 2021                [Page 4]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -277,7 +277,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 5]
+Oku & Pardue             Expires January 9, 2021                [Page 5]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -333,7 +333,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 6]
+Oku & Pardue             Expires January 9, 2021                [Page 6]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -389,7 +389,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 7]
+Oku & Pardue             Expires January 9, 2021                [Page 7]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -445,7 +445,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 8]
+Oku & Pardue             Expires January 9, 2021                [Page 8]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -501,7 +501,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021                [Page 9]
+Oku & Pardue             Expires January 9, 2021                [Page 9]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -557,7 +557,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 10]
+Oku & Pardue             Expires January 9, 2021               [Page 10]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -613,7 +613,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 11]
+Oku & Pardue             Expires January 9, 2021               [Page 11]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -669,7 +669,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 12]
+Oku & Pardue             Expires January 9, 2021               [Page 12]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -725,7 +725,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 13]
+Oku & Pardue             Expires January 9, 2021               [Page 13]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -745,9 +745,7 @@ Internet-Draft               HTTP Priorities                   July 2020
    Also, a client MAY use the priority values for making local
    scheduling choices for the requests it initiates.
 
-8.  Considerations
-
-8.1.  Why use an End-to-End Header Field?
+8.  Why use an End-to-End Header Field?
 
    Contrary to the prioritization scheme of HTTP/2 that uses a hop-by-
    hop frame, the Priority header field is defined as end-to-end.
@@ -779,14 +777,14 @@ Internet-Draft               HTTP Priorities                   July 2020
 
    Header field name:  Priority
 
+   Applicable protocol:  http
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 14]
+
+Oku & Pardue             Expires January 9, 2021               [Page 14]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
-
-   Applicable protocol:  http
 
    Status:  standard
 
@@ -837,7 +835,9 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 15]
+
+
+Oku & Pardue             Expires January 9, 2021               [Page 15]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -893,7 +893,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 16]
+Oku & Pardue             Expires January 9, 2021               [Page 16]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -949,7 +949,7 @@ Appendix B.  Change Log
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 17]
+Oku & Pardue             Expires January 9, 2021               [Page 17]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -1005,7 +1005,7 @@ B.5.  Since draft-kazuho-httpbis-priority-00
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 18]
+Oku & Pardue             Expires January 9, 2021               [Page 18]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -1061,4 +1061,4 @@ Authors' Addresses
 
 
 
-Oku & Pardue             Expires January 4, 2021               [Page 19]
+Oku & Pardue             Expires January 9, 2021               [Page 19]
