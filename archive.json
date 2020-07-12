@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-07-08T17:43:46.309289+00:00",
+  "timestamp": "2020-07-12T07:49:43.754002+00:00",
   "repo": "httpwg/http-extensions",
   "labels": [
     {
@@ -57600,7 +57600,7 @@
       "id": "MDExOlB1bGxSZXF1ZXN0MzczNTAyMDc2",
       "title": "rfced recommended section reference format",
       "url": "https://github.com/httpwg/http-extensions/pull/1058",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "reschke",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
@@ -57609,18 +57609,28 @@
       ],
       "body": "",
       "createdAt": "2020-02-11T07:01:19Z",
-      "updatedAt": "2020-05-26T20:18:52Z",
+      "updatedAt": "2020-07-08T17:46:04Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "5c386e8114209d9610814c09810e05dab12f08f4",
       "headRepository": "httpwg/http-extensions",
       "headRefName": "reschke-prio-1",
       "headRefOid": "45852f908237b14733db134d51664617a54876f5",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2020-07-08T17:45:57Z",
+      "mergedAt": "2020-07-08T17:45:57Z",
+      "mergedBy": "LPardue",
+      "mergeCommit": {
+        "oid": "6be5ead90c20fb13a818cf65e5badeacec911df3"
+      },
+      "comments": [
+        {
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "thanks",
+          "createdAt": "2020-07-08T17:46:04Z",
+          "updatedAt": "2020-07-08T17:46:04Z"
+        }
+      ],
       "reviews": [
         {
           "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDE4NjQ4MjI4",
@@ -63544,6 +63554,84 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 1224,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDQ2NDA4NzAx",
+      "title": "move Fairness and client scheduling to top level",
+      "url": "https://github.com/httpwg/http-extensions/pull/1224",
+      "state": "OPEN",
+      "author": "LPardue",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #1217 and #1218.\r\n\r\nI've left Security Consideration as TBD, I'll fill that out in a separate PR.",
+      "createdAt": "2020-07-08T18:20:16Z",
+      "updatedAt": "2020-07-08T18:21:12Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "6be5ead90c20fb13a818cf65e5badeacec911df3",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "lucas/priority-fairbump",
+      "headRefOid": "cf6962f96174d8a6cc48f05b8c7c9ee4d9ed9047",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 1225,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDQ2NDM0MTUw",
+      "title": "Rough in priorities security concerns",
+      "url": "https://github.com/httpwg/http-extensions/pull/1225",
+      "state": "OPEN",
+      "author": "LPardue",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Since fairness is being moved out of security considerations, (https://github.com/httpwg/http-extensions/pull/1224) it makes the section empty.\r\n\r\nSeems reasonable to add some prose about the considerations of this scheme as compared to HTTP/2. However, this also depends on the outcome of the reprioritization discussion, so I'm being a little weasly with TBD and TODOs.\r\n\r\nMight want to just hold onto this for a while but WDYT @kazuho ?",
+      "createdAt": "2020-07-08T19:15:30Z",
+      "updatedAt": "2020-07-08T19:15:34Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "6be5ead90c20fb13a818cf65e5badeacec911df3",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "lucas/priority-seccon",
+      "headRefOid": "8360f396213df085d81a7d5503bf30e36b7491d4",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 1226,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDQ3ODY1MDAy",
+      "title": "digest-headers: fix HTTP Semantics references",
+      "url": "https://github.com/httpwg/http-extensions/pull/1226",
+      "state": "OPEN",
+      "author": "reschke",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "(for -09)",
+      "createdAt": "2020-07-12T07:48:33Z",
+      "updatedAt": "2020-07-12T07:48:33Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "6be5ead90c20fb13a818cf65e5badeacec911df3",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "reschke-patch-1",
+      "headRefOid": "599ebb3e32363ff1a0b2804946f04aa3d643ed3a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
