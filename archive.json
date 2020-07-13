@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-07-12T07:49:43.754002+00:00",
+  "timestamp": "2020-07-13T00:24:36.008300+00:00",
   "repo": "httpwg/http-extensions",
   "labels": [
     {
@@ -28815,7 +28815,7 @@
       "id": "MDU6SXNzdWU2MzEzMDMzOTE=",
       "title": "Fairness section isn't a security consideration",
       "url": "https://github.com/httpwg/http-extensions/issues/1217",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "martinthomson",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [
@@ -28826,8 +28826,8 @@
       ],
       "body": "The whole discussion about fairness is worth having, but it doesn't really go to the usual security concerns.  Security concerns might cover things like DoS through over-use of prioritization (see #1021), or use of priority to starve others (which might cross-reference the fairness text).  But I think that the fairness text should be bumped up to the top level.",
       "createdAt": "2020-06-05T04:31:52Z",
-      "updatedAt": "2020-07-06T14:28:14Z",
-      "closedAt": null,
+      "updatedAt": "2020-07-13T00:23:39Z",
+      "closedAt": "2020-07-13T00:23:39Z",
       "comments": []
     },
     {
@@ -63560,26 +63560,42 @@
       "id": "MDExOlB1bGxSZXF1ZXN0NDQ2NDA4NzAx",
       "title": "move Fairness and client scheduling to top level",
       "url": "https://github.com/httpwg/http-extensions/pull/1224",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "LPardue",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Fixes #1217 and #1218.\r\n\r\nI've left Security Consideration as TBD, I'll fill that out in a separate PR.",
       "createdAt": "2020-07-08T18:20:16Z",
-      "updatedAt": "2020-07-08T18:21:12Z",
+      "updatedAt": "2020-07-13T00:23:40Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "6be5ead90c20fb13a818cf65e5badeacec911df3",
       "headRepository": "httpwg/http-extensions",
       "headRefName": "lucas/priority-fairbump",
       "headRefOid": "cf6962f96174d8a6cc48f05b8c7c9ee4d9ed9047",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2020-07-13T00:23:39Z",
+      "mergedAt": "2020-07-13T00:23:38Z",
+      "mergedBy": "LPardue",
+      "mergeCommit": {
+        "oid": "9fbfa86e5bd10b61fe431282c0bf75a58e08ca6b"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ2OTIyMTQ4",
+          "commit": {
+            "abbreviatedOid": "cf6962f"
+          },
+          "author": "kazuho",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-07-13T00:04:19Z",
+          "updatedAt": "2020-07-13T00:04:19Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 1225,
@@ -63593,7 +63609,7 @@
       "labels": [],
       "body": "Since fairness is being moved out of security considerations, (https://github.com/httpwg/http-extensions/pull/1224) it makes the section empty.\r\n\r\nSeems reasonable to add some prose about the considerations of this scheme as compared to HTTP/2. However, this also depends on the outcome of the reprioritization discussion, so I'm being a little weasly with TBD and TODOs.\r\n\r\nMight want to just hold onto this for a while but WDYT @kazuho ?",
       "createdAt": "2020-07-08T19:15:30Z",
-      "updatedAt": "2020-07-08T19:15:34Z",
+      "updatedAt": "2020-07-13T00:22:35Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "6be5ead90c20fb13a818cf65e5badeacec911df3",
@@ -63605,7 +63621,48 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ2OTIyNTY4",
+          "commit": {
+            "abbreviatedOid": "8360f39"
+          },
+          "author": "kazuho",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Thank you for working on this. LGTM modulo the point below.",
+          "createdAt": "2020-07-13T00:08:23Z",
+          "updatedAt": "2020-07-13T00:08:38Z",
+          "comments": [
+            {
+              "originalPosition": 85,
+              "body": "Should this \"could\" be something like \"is required to\"?\r\n\r\nOr maybe, \"would be required to ... depending on how the clients use the PRIORITY_UPDATE frames\".",
+              "createdAt": "2020-07-13T00:08:23Z",
+              "updatedAt": "2020-07-13T00:08:38Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ2OTI0MTA4",
+          "commit": {
+            "abbreviatedOid": "8360f39"
+          },
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-07-13T00:22:34Z",
+          "updatedAt": "2020-07-13T00:22:35Z",
+          "comments": [
+            {
+              "originalPosition": 85,
+              "body": "I think simply \"is required to\" is the most straightforward thing for now. We can revisit when we circle back on the TODOs after reprioritization chat.\r\n",
+              "createdAt": "2020-07-13T00:22:35Z",
+              "updatedAt": "2020-07-13T00:22:35Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 1226,
@@ -63619,7 +63676,7 @@
       "labels": [],
       "body": "(for -09)",
       "createdAt": "2020-07-12T07:48:33Z",
-      "updatedAt": "2020-07-12T07:48:33Z",
+      "updatedAt": "2020-07-12T23:53:21Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "6be5ead90c20fb13a818cf65e5badeacec911df3",
@@ -63631,7 +63688,21 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ2OTIxMDk0",
+          "commit": {
+            "abbreviatedOid": "599ebb3"
+          },
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-07-12T23:53:21Z",
+          "updatedAt": "2020-07-12T23:53:21Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
