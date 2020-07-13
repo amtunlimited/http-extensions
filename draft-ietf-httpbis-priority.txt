@@ -103,9 +103,9 @@ Table of Contents
    11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  16
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  16
-     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  17
-   Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  17
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  17
+     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  18
+   Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  18
 
 
 
@@ -116,8 +116,8 @@ Internet-Draft               HTTP Priorities                   July 2020
 
    Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  18
      B.1.  Since draft-kazuho-httpbis-priority-04  . . . . . . . . .  18
-     B.2.  Since draft-kazuho-httpbis-priority-03  . . . . . . . . .  18
-     B.3.  Since draft-kazuho-httpbis-priority-02  . . . . . . . . .  18
+     B.2.  Since draft-kazuho-httpbis-priority-03  . . . . . . . . .  19
+     B.3.  Since draft-kazuho-httpbis-priority-02  . . . . . . . . .  19
      B.4.  Since draft-kazuho-httpbis-priority-01  . . . . . . . . .  19
      B.5.  Since draft-kazuho-httpbis-priority-00  . . . . . . . . .  19
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
@@ -788,7 +788,40 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 10.  Security Considerations
 
-   TBD
+   [CVE-2019-9513] aka "Resource Loop", is a DoS attack based on
+   manipulation of the HTTP/2 priority tree.  Extensible priorities does
+   not use stream dependencies, which mitigates this vulnerability.
+
+   TBD: depending on the outcome of reprioritization discussions,
+   following paragraphs may change or be removed.
+
+   [RFC7540], Section 5.3.4 describes a scenario where closure of
+   streams in the priority tree could cause suboptimal prioritization.
+   To avoid this, [RFC7540] states that "an endpoint SHOULD retain
+   stream prioritization state for a period after streams become
+   closed".  Retaining state for streams no longer counted towards
+   stream concurrency consumes server resources.  Furthermore, [RFC7540]
+   identifies that reprioritization of a closed stream could affect
+   dependents; it recommends updating the priority tree if sufficient
+   state is stored, which will also consume server resources.  To limit
+   this commitment, it is stated that "The amount of prioritization
+   state that is retained MAY be limited" and "If a limit is applied,
+   endpoints SHOULD maintain state for at least as many streams as
+   allowed by their setting for SETTINGS_MAX_CONCURRENT_STREAMS.".
+   Extensible priorities does not use stream dependencies, which
+   minimizes most of the resource concerns related to this scenario.
+
+   [RFC7540], Section 5.3.4 also presents considerations about the state
+   required to store priority information about streams in an "idle"
+   state.  This state can be limited by adopting the guidance about
+   concurrency limits described above.  Extensible priorities is subject
+   to a similar consideration because PRIORITY_UPDATE frames may arrive
+   before the request that they reference.  A server is required to
+   store the information in order to apply the most up-to-date signal to
+   the request.  However, HTTP/3 implementations might have practical
+   barriers to determining reasonable stream concurrency limits
+   depending on the information that is available to them from the QUIC
+   transport layer.  TODO: so what can we suggest?
 
 11.  IANA Considerations
 
@@ -800,6 +833,14 @@ Internet-Draft               HTTP Priorities                   July 2020
    Applicable protocol:  http
 
    Status:  standard
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 15]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
 
    Author/change controller:  IETF
 
@@ -834,14 +875,6 @@ Internet-Draft               HTTP Priorities                   July 2020
 
    Code:  0xF
 
-
-
-
-Oku & Pardue            Expires January 14, 2021               [Page 15]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
-
    Specification:  This document
 
 12.  References
@@ -857,6 +890,13 @@ Internet-Draft               HTTP Priorities                   July 2020
               Iyengar, J. and M. Thomson, "QUIC: A UDP-Based Multiplexed
               and Secure Transport", draft-ietf-quic-transport-29 (work
               in progress), June 2020.
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 16]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -890,14 +930,6 @@ Internet-Draft               HTTP Priorities                   July 2020
               Priorities", draft-lassey-priority-setting-00 (work in
               progress), July 2019.
 
-
-
-
-Oku & Pardue            Expires January 14, 2021               [Page 16]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
-
    [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
               Procedures for Message Header Fields", BCP 90, RFC 3864,
               DOI 10.17487/RFC3864, September 2004,
@@ -911,6 +943,16 @@ Internet-Draft               HTTP Priorities                   July 2020
    [RFC7239]  Petersson, A. and M. Nilsson, "Forwarded HTTP Extension",
               RFC 7239, DOI 10.17487/RFC7239, June 2014,
               <https://www.rfc-editor.org/info/rfc7239>.
+
+
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 17]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
 
    [RFC8081]  Lilley, C., "The "font" Top-Level Media Type", RFC 8081,
               DOI 10.17487/RFC8081, February 2017,
@@ -945,15 +987,6 @@ Appendix A.  Acknowledgements
    thanks to Roberto Peon, Martin Thomson and Netflix for text that was
    incorporated explicitly in this document.
 
-
-
-
-
-Oku & Pardue            Expires January 14, 2021               [Page 17]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
-
    In addition to the people above, this document owes a lot to the
    extensive discussion in the HTTP priority design team, consisting of
    Alan Frindell, Andrew Galloni, Craig Taylor, Ian Swett, Kazuho Oku,
@@ -968,6 +1001,14 @@ B.1.  Since draft-kazuho-httpbis-priority-04
 
    o  Reduce guidance about how intermediary implements merging priority
       signals (#1026)
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 18]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
 
    o  Remove mention of CDN-Loop (#1062)
 
@@ -998,18 +1039,6 @@ B.3.  Since draft-kazuho-httpbis-priority-02
 
    o  Explain fairness issue and mitigations (#56)
 
-
-
-
-
-
-
-
-Oku & Pardue            Expires January 14, 2021               [Page 18]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
-
 B.4.  Since draft-kazuho-httpbis-priority-01
 
    o  Explain how reprioritization might be supported.
@@ -1024,6 +1053,17 @@ Authors' Addresses
    Fastly
 
    Email: kazuhooku@gmail.com
+
+
+
+
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 19]
+
+Internet-Draft               HTTP Priorities                   July 2020
 
 
    Lucas Pardue
@@ -1061,4 +1101,20 @@ Authors' Addresses
 
 
 
-Oku & Pardue            Expires January 14, 2021               [Page 19]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 20]
