@@ -1254,11 +1254,11 @@ Author's Address
 
    Mark Nottingham
    Fastly
+   Prahran, VIC
+   Australia
 
    Email: mnot@mnot.net
    URI:   https://www.mnot.net/
-
-
 
 
 

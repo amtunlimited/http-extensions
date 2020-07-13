@@ -2326,6 +2326,8 @@ Authors' Addresses
 
    Mark Nottingham
    Fastly
+   Prahran, VIC
+   Australia
 
    Email: mnot@mnot.net
    URI:   https://www.mnot.net/
@@ -2335,8 +2337,6 @@ Authors' Addresses
    The Varnish Cache Project
 
    Email: phk@varnish-cache.org
-
-
 
 
 
