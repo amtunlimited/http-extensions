@@ -5,8 +5,8 @@
 HTTP Working Group                                                K. Oku
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                               L. Pardue
-Expires: January 9, 2021                                      Cloudflare
-                                                           July 08, 2020
+Expires: January 14, 2021                                     Cloudflare
+                                                           July 13, 2020
 
 
                Extensible Prioritization Scheme for HTTP
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 1]
+Oku & Pardue            Expires January 14, 2021                [Page 1]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -61,7 +61,7 @@ Internet-Draft               HTTP Priorities                   July 2020
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 9, 2021.
+   This Internet-Draft will expire on January 14, 2021.
 
 Copyright Notice
 
@@ -93,32 +93,33 @@ Table of Contents
      5.1.  HTTP/2 PRIORITY_UPDATE Frame  . . . . . . . . . . . . . .   9
      5.2.  HTTP/3 PRIORITY_UPDATE Frame  . . . . . . . . . . . . . .  10
    6.  Merging Client- and Server-Driven Parameters  . . . . . . . .  11
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
-     7.1.  Fairness  . . . . . . . . . . . . . . . . . . . . . . . .  12
-       7.1.1.  Coalescing Intermediaries . . . . . . . . . . . . . .  12
-       7.1.2.  HTTP/1.x Back Ends  . . . . . . . . . . . . . . . . .  13
-       7.1.3.  Intentional Introduction of Unfairness  . . . . . . .  14
-   8.  Why use an End-to-End Header Field? . . . . . . . . . . . . .  14
-   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
-   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
-     10.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  16
-     10.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+   7.  Client Scheduling . . . . . . . . . . . . . . . . . . . . . .  12
+   8.  Fairness  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+     8.1.  Coalescing Intermediaries . . . . . . . . . . . . . . . .  13
+     8.2.  HTTP/1.x Back Ends  . . . . . . . . . . . . . . . . . . .  13
+     8.3.  Intentional Introduction of Unfairness  . . . . . . . . .  14
+   9.  Why use an End-to-End Header Field? . . . . . . . . . . . . .  14
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  15
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  16
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  16
+     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  17
    Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  17
-   Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  17
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 2]
+Oku & Pardue            Expires January 14, 2021                [Page 2]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
 
+   Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  18
      B.1.  Since draft-kazuho-httpbis-priority-04  . . . . . . . . .  18
      B.2.  Since draft-kazuho-httpbis-priority-03  . . . . . . . . .  18
      B.3.  Since draft-kazuho-httpbis-priority-02  . . . . . . . . .  18
-     B.4.  Since draft-kazuho-httpbis-priority-01  . . . . . . . . .  18
-     B.5.  Since draft-kazuho-httpbis-priority-00  . . . . . . . . .  18
+     B.4.  Since draft-kazuho-httpbis-priority-01  . . . . . . . . .  19
+     B.5.  Since draft-kazuho-httpbis-priority-00  . . . . . . . . .  19
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
 
 1.  Introduction
@@ -164,8 +165,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-
-Oku & Pardue             Expires January 9, 2021                [Page 3]
+Oku & Pardue            Expires January 14, 2021                [Page 3]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -221,7 +221,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 4]
+Oku & Pardue            Expires January 14, 2021                [Page 4]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -277,7 +277,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 5]
+Oku & Pardue            Expires January 14, 2021                [Page 5]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -333,7 +333,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 6]
+Oku & Pardue            Expires January 14, 2021                [Page 6]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -389,7 +389,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 7]
+Oku & Pardue            Expires January 14, 2021                [Page 7]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -445,7 +445,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 8]
+Oku & Pardue            Expires January 14, 2021                [Page 8]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -501,7 +501,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021                [Page 9]
+Oku & Pardue            Expires January 14, 2021                [Page 9]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -557,7 +557,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021               [Page 10]
+Oku & Pardue            Expires January 14, 2021               [Page 10]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -613,7 +613,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
 
-Oku & Pardue             Expires January 9, 2021               [Page 11]
+Oku & Pardue            Expires January 14, 2021               [Page 11]
 
 Internet-Draft               HTTP Priorities                   July 2020
 
@@ -640,9 +640,12 @@ Internet-Draft               HTTP Priorities                   July 2020
    specified by the client, as the server did not specify the
    incremental("i") parameter.
 
-7.  Security Considerations
+7.  Client Scheduling
 
-7.1.  Fairness
+   A client MAY use priority values to make local scheduling choices
+   about the requests it initiates.
+
+8.  Fairness
 
    As a general guideline, a server SHOULD NOT use priority information
    for making schedule decisions across multiple connections, unless it
@@ -659,20 +662,24 @@ Internet-Draft               HTTP Priorities                   July 2020
    next hop that the connection is NOT coalesced (see
    https://github.com/kazuho/draft-kazuho-httpbis-priority/issues/99).
 
-7.1.1.  Coalescing Intermediaries
+
+
+
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 12]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
+8.1.  Coalescing Intermediaries
 
    When an intermediary coalesces HTTP requests coming from multiple
    clients into one HTTP/2 or HTTP/3 connection going to the backend
    server, requests that originate from one client might have higher
    precedence than those coming from others.
-
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 12]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
 
    It is sometimes beneficial for the server running behind an
    intermediary to obey to the value of the Priority header field.  As
@@ -708,13 +715,21 @@ Internet-Draft               HTTP Priorities                   July 2020
    would receive less bandwidth in case the bottleneck exists between
    the server and the intermediary.
 
-7.1.2.  HTTP/1.x Back Ends
+8.2.  HTTP/1.x Back Ends
 
    It is common for CDN infrastructure to support different HTTP
    versions on the front end and back end.  For instance, the client-
    facing edge might support HTTP/2 and HTTP/3 while communication to
    back end servers is done using HTTP/1.1.  Unlike with connection
    coalescing, the CDN will "de-mux" requests into discrete connections
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 13]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
    to the back end.  As HTTP/1.1 and older do not provide a way to
    concurrently transmit multiple responses, there is no immediate
    fairness issue in protocol.  However, back end servers MAY still use
@@ -723,14 +738,7 @@ Internet-Draft               HTTP Priorities                   July 2020
    can be scoped to individual end clients.  Authentication and other
    session information might provide this linkability.
 
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 13]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
-
-7.1.3.  Intentional Introduction of Unfairness
+8.3.  Intentional Introduction of Unfairness
 
    It is sometimes beneficial to deprioritize the transmission of one
    connection over others, knowing that doing so introduces a certain
@@ -742,10 +750,7 @@ Internet-Draft               HTTP Priorities                   July 2020
    software update images.  Doing so improves responsiveness of other
    connections at the cost of delaying the delivery of updates.
 
-   Also, a client MAY use the priority values for making local
-   scheduling choices for the requests it initiates.
-
-8.  Why use an End-to-End Header Field?
+9.  Why use an End-to-End Header Field?
 
    Contrary to the prioritization scheme of HTTP/2 that uses a hop-by-
    hop frame, the Priority header field is defined as end-to-end.
@@ -770,7 +775,22 @@ Internet-Draft               HTTP Priorities                   July 2020
    textual value makes the prioritization scheme extensible; see the
    discussion below.
 
-9.  IANA Considerations
+
+
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 14]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
+10.  Security Considerations
+
+   TBD
+
+11.  IANA Considerations
 
    This specification registers the following entry in the Permanent
    Message Header Field Names registry established by [RFC3864]:
@@ -778,13 +798,6 @@ Internet-Draft               HTTP Priorities                   July 2020
    Header field name:  Priority
 
    Applicable protocol:  http
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 14]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
 
    Status:  standard
 
@@ -821,26 +834,24 @@ Internet-Draft               HTTP Priorities                   July 2020
 
    Code:  0xF
 
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 15]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
    Specification:  This document
 
-10.  References
+12.  References
 
-10.1.  Normative References
+12.1.  Normative References
 
    [I-D.ietf-quic-http]
               Bishop, M., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", draft-ietf-quic-http-29 (work in progress),
               June 2020.
-
-
-
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 15]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
 
    [I-D.ietf-quic-transport]
               Iyengar, J. and M. Thomson, "QUIC: A UDP-Based Multiplexed
@@ -867,7 +878,7 @@ Internet-Draft               HTTP Priorities                   July 2020
               HTTP", draft-ietf-httpbis-header-structure-19 (work in
               progress), June 2020.
 
-10.2.  Informative References
+12.2.  Informative References
 
    [CVE-2019-9513]
               Common Vulnerabilities and Exposures, "CVE-2019-9513",
@@ -879,6 +890,14 @@ Internet-Draft               HTTP Priorities                   July 2020
               Priorities", draft-lassey-priority-setting-00 (work in
               progress), July 2019.
 
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 16]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
    [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
               Procedures for Message Header Fields", BCP 90, RFC 3864,
               DOI 10.17487/RFC3864, September 2004,
@@ -889,15 +908,6 @@ Internet-Draft               HTTP Priorities                   July 2020
               RFC 7234, DOI 10.17487/RFC7234, June 2014,
               <https://www.rfc-editor.org/info/rfc7234>.
 
-
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 16]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
-
    [RFC7239]  Petersson, A. and M. Nilsson, "Forwarded HTTP Extension",
               RFC 7239, DOI 10.17487/RFC7239, June 2014,
               <https://www.rfc-editor.org/info/rfc7239>.
@@ -906,7 +916,7 @@ Internet-Draft               HTTP Priorities                   July 2020
               DOI 10.17487/RFC8081, February 2017,
               <https://www.rfc-editor.org/info/rfc8081>.
 
-10.3.  URIs
+12.3.  URIs
 
    [1] https://lists.w3.org/Archives/Public/ietf-http-wg/
 
@@ -935,6 +945,15 @@ Appendix A.  Acknowledgements
    thanks to Roberto Peon, Martin Thomson and Netflix for text that was
    incorporated explicitly in this document.
 
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 17]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
    In addition to the people above, this document owes a lot to the
    extensive discussion in the HTTP priority design team, consisting of
    Alan Frindell, Andrew Galloni, Craig Taylor, Ian Swett, Kazuho Oku,
@@ -942,17 +961,6 @@ Appendix A.  Acknowledgements
    Fielding.
 
 Appendix B.  Change Log
-
-
-
-
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 17]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
 
 B.1.  Since draft-kazuho-httpbis-priority-04
 
@@ -990,6 +998,18 @@ B.3.  Since draft-kazuho-httpbis-priority-02
 
    o  Explain fairness issue and mitigations (#56)
 
+
+
+
+
+
+
+
+Oku & Pardue            Expires January 14, 2021               [Page 18]
+
+Internet-Draft               HTTP Priorities                   July 2020
+
+
 B.4.  Since draft-kazuho-httpbis-priority-01
 
    o  Explain how reprioritization might be supported.
@@ -997,18 +1017,6 @@ B.4.  Since draft-kazuho-httpbis-priority-01
 B.5.  Since draft-kazuho-httpbis-priority-00
 
    o  Expand urgency levels from 3 to 8.
-
-
-
-
-
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 18]
-
-Internet-Draft               HTTP Priorities                   July 2020
-
 
 Authors' Addresses
 
@@ -1053,12 +1061,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-Oku & Pardue             Expires January 9, 2021               [Page 19]
+Oku & Pardue            Expires January 14, 2021               [Page 19]
