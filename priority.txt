@@ -115,12 +115,13 @@ Internet-Draft               HTTP Priorities                   July 2020
 
 
    Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  18
-     B.1.  Since draft-kazuho-httpbis-priority-04  . . . . . . . . .  18
-     B.2.  Since draft-kazuho-httpbis-priority-03  . . . . . . . . .  19
-     B.3.  Since draft-kazuho-httpbis-priority-02  . . . . . . . . .  19
-     B.4.  Since draft-kazuho-httpbis-priority-01  . . . . . . . . .  19
-     B.5.  Since draft-kazuho-httpbis-priority-00  . . . . . . . . .  19
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
+     B.1.  Since draft-ietf-httpbis-priority-00  . . . . . . . . . .  18
+     B.2.  Since draft-kazuho-httpbis-priority-04  . . . . . . . . .  19
+     B.3.  Since draft-kazuho-httpbis-priority-03  . . . . . . . . .  19
+     B.4.  Since draft-kazuho-httpbis-priority-02  . . . . . . . . .  19
+     B.5.  Since draft-kazuho-httpbis-priority-01  . . . . . . . . .  19
+     B.6.  Since draft-kazuho-httpbis-priority-00  . . . . . . . . .  19
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
 
 1.  Introduction
 
@@ -161,7 +162,6 @@ Internet-Draft               HTTP Priorities                   July 2020
 
    The terms sh-token and sh-boolean are imported from
    [STRUCTURED-HEADERS].
-
 
 
 
@@ -995,12 +995,12 @@ Appendix A.  Acknowledgements
 
 Appendix B.  Change Log
 
-B.1.  Since draft-kazuho-httpbis-priority-04
+B.1.  Since draft-ietf-httpbis-priority-00
 
-   o  Minimize semantics of Urgency levels (#1023, #1026)
+   o  Move text around (#1217, #1218)
 
-   o  Reduce guidance about how intermediary implements merging priority
-      signals (#1026)
+   o  Editorial change to the default urgency.  The value is 3, which
+      was always the intent of previous changes.
 
 
 
@@ -1010,6 +1010,13 @@ Oku & Pardue            Expires January 14, 2021               [Page 18]
 Internet-Draft               HTTP Priorities                   July 2020
 
 
+B.2.  Since draft-kazuho-httpbis-priority-04
+
+   o  Minimize semantics of Urgency levels (#1023, #1026)
+
+   o  Reduce guidance about how intermediary implements merging priority
+      signals (#1026)
+
    o  Remove mention of CDN-Loop (#1062)
 
    o  Editorial changes
@@ -1018,7 +1025,7 @@ Internet-Draft               HTTP Priorities                   July 2020
 
    o  Removed outdated Consideration (#118)
 
-B.2.  Since draft-kazuho-httpbis-priority-03
+B.3.  Since draft-kazuho-httpbis-priority-03
 
    o  Changed numbering from "[-1,6]" to "[0,7]" (#78)
 
@@ -1029,7 +1036,7 @@ B.2.  Since draft-kazuho-httpbis-priority-03
 
    o  Expand on considerations (#105, #107, #109, #110, #111, #113)
 
-B.3.  Since draft-kazuho-httpbis-priority-02
+B.4.  Since draft-kazuho-httpbis-priority-02
 
    o  Consolidation of the problem statement (#61, #73)
 
@@ -1039,20 +1046,13 @@ B.3.  Since draft-kazuho-httpbis-priority-02
 
    o  Explain fairness issue and mitigations (#56)
 
-B.4.  Since draft-kazuho-httpbis-priority-01
+B.5.  Since draft-kazuho-httpbis-priority-01
 
    o  Explain how reprioritization might be supported.
 
-B.5.  Since draft-kazuho-httpbis-priority-00
+B.6.  Since draft-kazuho-httpbis-priority-00
 
    o  Expand urgency levels from 3 to 8.
-
-Authors' Addresses
-
-   Kazuho Oku
-   Fastly
-
-   Email: kazuhooku@gmail.com
 
 
 
@@ -1066,18 +1066,18 @@ Oku & Pardue            Expires January 14, 2021               [Page 19]
 Internet-Draft               HTTP Priorities                   July 2020
 
 
+Authors' Addresses
+
+   Kazuho Oku
+   Fastly
+
+   Email: kazuhooku@gmail.com
+
+
    Lucas Pardue
    Cloudflare
 
    Email: lucaspardue.24.7@gmail.com
-
-
-
-
-
-
-
-
 
 
 
