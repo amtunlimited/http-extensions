@@ -4,8 +4,8 @@
 
 HTTP Working Group                                         M. Nottingham
 Internet-Draft                                                    Fastly
-Intended status: Standards Track                           July 13, 2020
-Expires: January 14, 2021
+Intended status: Standards Track                           July 15, 2020
+Expires: January 16, 2021
 
 
               The Cache-Status HTTP Response Header Field
@@ -13,9 +13,10 @@ Expires: January 14, 2021
 
 Abstract
 
-   To aid debugging, HTTP caches often append headers to a response
-   detailing how they handled the request.  This specification codifies
-   that practice and updates it for HTTP's current caching model.
+   To aid debugging, HTTP caches often append header fields to a
+   response explaining how they handled the request.  This specification
+   codifies that practice and updates it to align with HTTP's current
+   caching model.
 
 Note to Readers
 
@@ -44,7 +45,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 14, 2021.
+   This Internet-Draft will expire on January 16, 2021.
 
 
 
@@ -52,8 +53,7 @@ Status of This Memo
 
 
 
-
-Nottingham              Expires January 14, 2021                [Page 1]
+Nottingham              Expires January 16, 2021                [Page 1]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
@@ -91,16 +91,14 @@ Table of Contents
      5.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
      5.2.  Informative References  . . . . . . . . . . . . . . . . .   7
      5.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
 
 1.  Introduction
 
-   To aid debugging, HTTP caches often append headers to a response
-   detailing how they handled the request.
-
-   Unfortunately, the semantics of these headers are often unclear, and
-   both the semantics and syntax used vary greatly between
-   implementations.
+   To aid debugging, HTTP caches often append header fields to a
+   response explaining how they handled the request.  Unfortunately, the
+   semantics of these headers are often unclear, and both the semantics
+   and syntax used vary greatly between implementations.
 
    This specification defines a single, new HTTP response header field,
    "Cache-Status" for this purpose.
@@ -109,7 +107,9 @@ Table of Contents
 
 
 
-Nottingham              Expires January 14, 2021                [Page 2]
+
+
+Nottingham              Expires January 16, 2021                [Page 2]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
@@ -132,7 +132,7 @@ Internet-Draft             Cache-Status Header                 July 2020
 
    Its value is a List [I-D.ietf-httpbis-header-structure]:
 
-   Cache-Status   = sh-list
+   Cache-Status   = sf-list
 
    Each member of the list represents a cache that has handled the
    request.  The first member of the list represents the cache closest
@@ -147,14 +147,14 @@ Internet-Draft             Cache-Status Header                 July 2020
    debugging mode.
 
    When adding a value to the Cache-Status header field, caches SHOULD
-   preserve the existing contents of the header, to allow debugging of
-   the entire chain of caches handling the request.
+   preserve the existing contents of the header field, to allow
+   debugging of the entire chain of caches handling the request.
 
    Each list member identifies the cache that inserted that value, and
-   MUST have a type of either sh-string or sh-token.  Depending on the
-   deployment, this might be a product or service name (e.g.,
-   ExampleCache or "Example CDN"), a hostname ("cache-3.example.com"),
-   and IP address, or a generated string.
+   MUST be a String or Token.  Depending on the deployment, this might
+   be a product or service name (e.g., ExampleCache or "Example CDN"), a
+   hostname ("cache-3.example.com"), and IP address, or a generated
+   string.
 
    Each member of the list can also have parameters that describe that
    cache's handling of the request.  While all of these parameters are
@@ -165,34 +165,37 @@ Internet-Draft             Cache-Status Header                 July 2020
 
 
 
-Nottingham              Expires January 14, 2021                [Page 3]
+Nottingham              Expires January 16, 2021                [Page 3]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
 
-   hit          = sh-boolean
-   fwd          = sh-token
-   fwd-status   = sh-integer
-   ttl          = sh-integer
-   stored       = sh-boolean
-   collapsed    = sh-boolean
-   key          = sh-string
+   hit          = sf-boolean
+   fwd          = sf-token
+   fwd-status   = sf-integer
+   ttl          = sf-integer
+   stored       = sf-boolean
+   collapsed    = sf-boolean
+   key          = sf-string
 
 2.1.  The hit parameter
 
    "hit", when true, indicates that the request was satisfied by the
-   cache; i.e., it did not go forward, and the response was obtained
-   from the cache (possibly with modifications; e.g., if the request was
-   conditional, a 304 Not Modified could be generated from cache).
+   cache; i.e., it did not go forward and the response was obtained from
+   the cache.  A response that originally was produced by the origin but
+   was modified by the cache (for example, a 304 or 206 status code) is
+   still considered a hit.
 
    "hit" and "fwd" are exclusive; only one of them should appear on each
    list member.
 
 2.2.  The fwd parameter
 
-   "fwd" indicates why the request went forward.
+   "fwd" indicates that the request went forward towards the origin, and
+   why.
 
-   It can have one of the following values:
+   The following values are defined to explain why the request went
+   forward:
 
    o  uri-miss - The cache did not contain any responses that matched
       the request URI
@@ -218,10 +221,7 @@ Internet-Draft             Cache-Status Header                 July 2020
 
 
 
-
-
-
-Nottingham              Expires January 14, 2021                [Page 4]
+Nottingham              Expires January 16, 2021                [Page 4]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
@@ -247,9 +247,8 @@ Internet-Draft             Cache-Status Header                 July 2020
 
 2.5.  The stored parameter
 
-   "stored" indicates whether the cache stored the forward response; a
-   true value indicates that it did.  Only meaningful when fwd is
-   present.
+   "stored" indicates whether the cache stored the response; a true
+   value indicates that it did.  Only meaningful when fwd is present.
 
 2.6.  The collapsed parameter
 
@@ -274,15 +273,14 @@ Internet-Draft             Cache-Status Header                 July 2020
 
    Cache-Status: ExampleCache; hit; ttl=376
 
+   A stale hit just has negative freshness:
 
 
 
-Nottingham              Expires January 14, 2021                [Page 5]
+Nottingham              Expires January 16, 2021                [Page 5]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
-
-   A stale hit just has negative freshness:
 
    Cache-Status: ExampleCache; hit; ttl=-412
 
@@ -316,30 +314,29 @@ Internet-Draft             Cache-Status Header                 July 2020
    information (using a variety of techniques), so this does not
    represent an attack vector in the general sense.
 
-   However, if the Cache-Status header is exposed to parties who are not
-   authorised to obtain the response it occurs within, it could expose
-   information about that data.
+   However, if the Cache-Status header field is exposed to parties who
+   are not authorised to obtain the response it occurs within, it could
+   expose information about that data.
 
    For example, if an attacker were able to obtain the Cache-Status
-   header from a response containing sensitive information and access
-   were limited to one person (or limited set of people), they could
-   determine whether that information had been accessed before.  This is
-   similar to the information exposed by various timing attacks, but is
-   arguably more reliable, since the cache is directly reporting its
-   state.
+   header field from a response containing sensitive information and
+   access were limited to one person (or limited set of people), they
+   could determine whether that information had been accessed before.
+   This is similar to the information exposed by various timing attacks,
+   but is arguably more reliable, since the cache is directly reporting
+   its state.
 
    Mitigations include use of encryption (e.g., TLS [RFC8446])) to
    protect the response, and careful controls over access to response
+   header fields (as are present in the Web platform).  When in doubt,
+   the Cache-Status header field can be omitted.
 
 
 
-Nottingham              Expires January 14, 2021                [Page 6]
+Nottingham              Expires January 16, 2021                [Page 6]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
-
-   headers (as are present in the Web platform).  When in doubt, the
-   Cache-Status header field can be omitted.
 
 5.  References
 
@@ -382,6 +379,7 @@ Internet-Draft             Cache-Status Header                 July 2020
 
    [3] https://github.com/httpwg/http-extensions/labels/cache-header
 
+Author's Address
 
 
 
@@ -389,12 +387,12 @@ Internet-Draft             Cache-Status Header                 July 2020
 
 
 
-Nottingham              Expires January 14, 2021                [Page 7]
+
+
+Nottingham              Expires January 16, 2021                [Page 7]
 
 Internet-Draft             Cache-Status Header                 July 2020
 
-
-Author's Address
 
    Mark Nottingham
    Fastly
@@ -445,4 +443,6 @@ Author's Address
 
 
 
-Nottingham              Expires January 14, 2021                [Page 8]
+
+
+Nottingham              Expires January 16, 2021                [Page 8]
