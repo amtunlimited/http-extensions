@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-07-15T07:49:15.361248+00:00",
+  "timestamp": "2020-07-16T06:27:56.779378+00:00",
   "repo": "httpwg/http-extensions",
   "labels": [
     {
@@ -23678,7 +23678,7 @@
       "labels": [],
       "body": "As requested by @reschke in httpwg/http-core#250, I'm creating an issue for the specification of the `SEARCH` method as an alternative to `POST`, making search requests safe, idempotent and cacheable.\r\n\r\nAs discussed in the HTTP Workshop in May, `GET` requests with a body is in use by large vendors such as Elasticsearch (see elastic/elasticsearch#16024) and their interpretation of the spec being that this is \"just fine\" (see https://github.com/elastic/elasticsearch-php/issues/737#issuecomment-378590773). Language is hopefully being added to the spec that makes this not seem \"just fine\" anymore, but I think we also need to provide a solution to the specific problem of not wanting to jam JSON into a URL to be able to use the `GET` keyword.\r\n\r\nWhile `POST` with the header defined in #942 would help, `POST` is still an unsafe method that poorly reflects the safe, idempotent semantics of search-like operations. I therefore argue that a a `SEARCH` method is needed to have a safe, idempotent method with explicit caching support, in opposition to `POST` which explicitly is **not cacheable**.\r\n\r\nThe [current draft](https://tools.ietf.org/html/draft-snell-search-method-01) for `SEARCH` is written by @jasnell, but I hope he would be willing to hand over the spec to someone else.",
       "createdAt": "2019-10-01T10:02:26Z",
-      "updatedAt": "2019-10-10T09:46:47Z",
+      "updatedAt": "2020-07-16T00:53:46Z",
       "closedAt": null,
       "comments": [
         {
@@ -23701,6 +23701,13 @@
           "body": "@MikeBishop, this issue got a reply from both you and @jasnell, so I'd say its creation is an absolute success so far! \ud83c\udf89 \ud83d\ude04 I agree it needs proper stewardship, though, so now that James has agreed to hand it over, we \"just\" need someone who knows how to write an I-D to take it and to do exactly as you suggest and revive/rewrite the draft.",
           "createdAt": "2019-10-10T09:46:47Z",
           "updatedAt": "2019-10-10T09:46:47Z"
+        },
+        {
+          "author": "mitar",
+          "authorAssociation": "NONE",
+          "body": "I think `SEARCH` is to specific. What about `FETCH` or `RETRIEVE`?",
+          "createdAt": "2020-07-16T00:53:46Z",
+          "updatedAt": "2020-07-16T00:53:46Z"
         }
       ]
     },
@@ -24771,7 +24778,7 @@
       "id": "MDU6SXNzdWU1MzAxMDE4NTg=",
       "title": "Cache-Status granularity issues, reintroduce summary token?",
       "url": "https://github.com/httpwg/http-extensions/issues/994",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "triblondon",
       "authorAssociation": "NONE",
       "assignees": [],
@@ -24780,8 +24787,8 @@
       ],
       "body": "The last time I reviewed this spec it had essentially a single key, the header itself, and an enum of possible values, which would be repeated if the response passed through multiple cache layers:\r\n\r\n```\r\ncache-action   = %s\"HIT_FRESH\"\r\n               / %s\"HIT_STALE\"\r\n               / %s\"HIT_REFRESH_MODIFIED\"\r\n               / %s\"HIT_REFRESH_NOT_MODIFIED\"\r\n               / %s\"HIT_REFRESH_STALE\"\r\n               / %s\"MISS\"\r\n               / %s\"MISS_CLIENT\"\r\n               / %s\"BYPASS\"\r\n               / %s\"ERROR\"\r\n```\r\n\r\nThere was certainly scope to make this more detailed, but it seemed elegant enough and was essentially a like for lie replacement of what most caches already do.  The current version goes too far in my opinion.  I see the following use cases:\r\n\r\n1. Developer of site using the header interactively for debugging\r\n2. Developers' CI tools asserting expected behaviours against the header for smoke testing\r\n3. Developers monitoring their CDN partner's cache efficacy (via RUM, I guess, ideally)\r\n4. Cache operators optimising their behaviour based on a better understanding of upstream cache status\r\n5. Researchers wanting to understand the state of the web more generally\r\n\r\nMany of these use cases arguably call for the most granular and detailed possible information to be included, but I would argue that 95% of the value of this type of header is use case 1.  And in the latest revision, we have lost a simple, clear status token.\r\n\r\nI'd propose reintroducing an enum of statuses, and support the additional params as enrichment. So a complexish example:\r\n\r\n```\r\nCache-Status: MISS; cache=fastly-bwi-1234; collapse-hit=?1,\r\n              HIT_FRESH; cache=akamai; res-fresh=289\r\n```\r\n\r\nThe current proposal already has a keyless param, for the cache name.  I'm essentially proposing that we add a key to that param, and introduce a new keyless param, for the summary cache status.\r\n\r\nThe result is that this is MUCH easier for developers to scan, a minimal implementation is more immediately useful (because as a cache you need only implement the keyless status param, not any of the others) and therefore implementation/adoption could be faster.  A minmal example could be (exactly as per the earlier spec draft):\r\n\r\n```\r\nCache-Status: HIT_FRESH\r\n```\r\n\r\nWhereas the minimal implementation of the current draft would be something like `Cache-Status: ExampleCache` and (at least for use case 1) that's unlikely to tell anyone anything they don't already know.",
       "createdAt": "2019-11-28T23:47:32Z",
-      "updatedAt": "2020-02-25T05:03:44Z",
-      "closedAt": null,
+      "updatedAt": "2020-07-15T08:23:48Z",
+      "closedAt": "2020-07-15T08:23:48Z",
       "comments": [
         {
           "author": "mnot",
@@ -24803,6 +24810,13 @@
           "body": "I don't think we're going to reintroduce the all-in-one tokens for reasons previously discussed, but I've tweaked things to be a bit friendlier (see most recent editors' draft); e.g., the examples above would be:\r\n\r\n~~~\r\nCache-Status: fastly-bwi-1234; fwd=uri-miss; collapsed,\r\n            Akamai; hit; ttl=289\r\n~~~\r\n",
           "createdAt": "2020-02-25T05:03:44Z",
           "updatedAt": "2020-02-25T05:03:44Z"
+        },
+        {
+          "author": "mnot",
+          "authorAssociation": "MEMBER",
+          "body": "Talked to @triblondon, he thinks this has been addressed by recent changes.",
+          "createdAt": "2020-07-15T08:23:48Z",
+          "updatedAt": "2020-07-15T08:23:48Z"
         }
       ]
     },
