@@ -1070,6 +1070,7 @@ Authors' Addresses
 
    Mark Nottingham
    Fastly
+   made in
    Prahran, VIC
    Australia
 
@@ -1081,7 +1082,6 @@ Authors' Addresses
    Google
 
    Email: piotrsikora@google.com
-
 
 
 

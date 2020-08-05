@@ -374,7 +374,7 @@ Internet-Draft             Cache-Status Header               August 2020
 5.  IANA Considerations
 
    Upon publication, please create the HTTP Cache-Status Parameters
-   registry at https://iana.org/assignments/http-cache-statuses [5] and
+   registry at https://iana.org/assignments/http-cache-status [5] and
    populate it with the types defined in Section 2; see Section 4 for
    its associated procedures.
 
@@ -466,7 +466,7 @@ Internet-Draft             Cache-Status Header               August 2020
 
    [4] https://iana.org/assignments/http-cache-status
 
-   [5] https://iana.org/assignments/http-cache-statuses
+   [5] https://iana.org/assignments/http-cache-status
 
 Author's Address
 

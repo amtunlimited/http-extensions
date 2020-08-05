@@ -2326,6 +2326,7 @@ Authors' Addresses
 
    Mark Nottingham
    Fastly
+   made in
    Prahran, VIC
    Australia
 
@@ -2337,7 +2338,6 @@ Authors' Addresses
    The Varnish Cache Project
 
    Email: phk@varnish-cache.org
-
 
 
 
