@@ -271,7 +271,7 @@ Internet-Draft             Cache-Status Header               August 2020
 
    For example:
 
-   Cache-Status: ExampleCache; hit; details=MEMORY
+   Cache-Status: ExampleCache; hit; detail=MEMORY
 
 
 
