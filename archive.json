@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-07-16T06:27:56.779378+00:00",
+  "timestamp": "2020-08-06T00:12:05.682391+00:00",
   "repo": "httpwg/http-extensions",
   "labels": [
     {
@@ -18951,7 +18951,7 @@
       ],
       "body": "In Firefox and Safari, |document.cookie| matches the |Cookie| header. \r\nIn Chrome and Edge, samesite=strict cookies are omitted from the |Cookie| header but included in the |document.cookies| collection following a cross-origin navigation.\r\n\r\nTest: https://debugtheweb.com/test/cookie/samesite/\r\nChrome Issue Tracker: https://crbug.com/925311 ",
       "createdAt": "2019-02-13T23:03:11Z",
-      "updatedAt": "2019-12-27T10:18:58Z",
+      "updatedAt": "2020-07-20T17:17:00Z",
       "closedAt": null,
       "comments": [
         {
@@ -18960,6 +18960,13 @@
           "body": "Related: https://bugzilla.mozilla.org/show_bug.cgi?id=1530995 (contrary to the test and Chrome issue linked above, the cookie here is set in the response after the navigation; it's still related to how to build a cookie-string for non-HTTP API and whether SameSite cookies should be returned or not)",
           "createdAt": "2019-03-01T13:36:21Z",
           "updatedAt": "2019-03-01T13:36:21Z"
+        },
+        {
+          "author": "annevk",
+          "authorAssociation": "NONE",
+          "body": "See also https://github.com/whatwg/html/issues/804 and #1073.",
+          "createdAt": "2020-07-20T17:17:00Z",
+          "updatedAt": "2020-07-20T17:17:00Z"
         }
       ]
     },
@@ -22456,9 +22463,17 @@
       ],
       "body": "(Notation: => is a navigation, -> is a redirect, \"A\" is the first party site which has SameSite cookies set on it.)\r\n\r\nCurrently, top-level A=>B->A results in sending both Strict and Lax cookies on the redirect back to A, as reflected in this WPT testcase: https://github.com/web-platform-tests/wpt/blob/master/cookies/samesite/form-get-blank.html#L58\r\n\r\nThis should ideally send Lax (but not Strict) cookies, because the analogous top-level navigation scenario A=>B=>A would result in sending only Lax but not Strict cookies to A on the last navigation.",
       "createdAt": "2019-08-08T22:26:16Z",
-      "updatedAt": "2019-12-27T10:18:59Z",
+      "updatedAt": "2020-07-27T15:14:38Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "kiding",
+          "authorAssociation": "NONE",
+          "body": "I'd like to weigh in on resolving this issue since the browser implementations have diverged. \r\n\r\nFollowing the A=>B->A example, the Chrome/Chromium test cases (implemented by @chlily1, exported to web-platform-tests) assume both A's are \"strictly same-site.\" (See [`wpt@2379191`](https://github.com/web-platform-tests/wpt/blob/2379191282384315dfa83973551badbc997ce683/cookies/samesite/form-get-blank.https.html#L58))\r\n\r\nOn the Safari/WebKit side, the test cases assume both A's are _not strict_. (See [`webkit@d615092`](https://github.com/WebKit/webkit/blob/d61509279f6864b7c81e2219f87c3d1130549c32/LayoutTests/http/tests/cookies/same-site/fetch-after-top-level-cross-origin-redirect-expected.txt#L7)) This behavior (which I personally prefer) is consistent with the A=>B=>A scenario. Firefox/Gecko behaves like WebKit. (See [`gecko-dev@15cc802`](https://github.com/mozilla/gecko-dev/blob/15cc8023f7861e4bb56cd43f179d5c45937d7c19/dom/security/test/general/test_same_site_cookies_redirect.html#L38-L43)) There even is a 2-year-old [bug 1456408](https://bugzilla.mozilla.org/show_bug.cgi?id=1456408) that's basically the same as this issue.\r\n\r\nFYI, A simple demo page to test with is available at https://brass-tremendous-marmoset.glitch.me.",
+          "createdAt": "2020-07-27T15:14:38Z",
+          "updatedAt": "2020-07-27T15:14:38Z"
+        }
+      ]
     },
     {
       "number": 894,
@@ -25435,7 +25450,7 @@
       ],
       "body": "There has been some debate about the relative utility of frames as a means of prioritizing and reprioritizing requests.  \r\n\r\nFrames are not guaranteed to be end-to-end and don't enjoy the benefits listed in [Section 8.1](https://httpwg.org/http-extensions/draft-ietf-httpbis-priority.html#why-use-an-end-to-end-header-field).  An (unlisted) reason is that the API for header fields is better understood and more likely to be available than a new and unspecified API.  HTTP/2 defined the use of frames for reprioritization, but APIs are not widely available, nor are they consistent.\r\n\r\nFrames provide two obvious benefits:\r\n\r\n1. They are scoped to the current connection and so only propagate if the receiving endpoint explicitly propagates them.\r\n\r\n2. They can be sent at any time.  This allows for reprioritization, but the requirement to have them sent after requests are complete means that they can't be sent \"on\" a stream, they have to instead refer to a stream, which complicates the design somewhat.  The proposal to allow trailers at any time helps a little here, but only to the extent that it remains possible to send.  Stream closure is used to terminate request bodies in some cases, making any trailer-based solution limited.\r\n\r\nHowever, frames have shortcomings too:\r\n\r\n1. They are complex.  The encoding of a header field into a frame is suboptimal, but necessary for extensibility and consistency reasons.  And the manner in which they refer to requests (or pushes) makes them more complex to manage than a header field.\r\n\r\n2. They are only scoped to a connection, which means that the extent of propagation can be non-deterministic.  In particular, they depend on the connection supporting the signaling.  This is the flip side of the benefit, and - in my opinion - outweighs it.\r\n\r\n3. The API is far more difficult compared to header fields.\r\n\r\nWe know little enough about the efficacy of prioritization that we should defer the definition of frames absent strong motivation for their efficacy and desirability.  The current document makes a good case for header fields, but the motivation for frames is weaker.  It is true that cases like escalation of a speculative fetch to blocking status are *theoretically* appealing, but those cases are rare and unlikely to benefit from reprioritization.  In particular, the mismatch between end-to-end and hop-by-hop (excuse the use of deprecated terminology) characteristics here makes it very hard to reason about the outcome.\r\n\r\nI know that others (@RyanAtGoogle in particular) have questions about the header field from a different angle and would prefer frames, exclusively.  So this probably comes down to having more discussion about which approach to take: headers, frames, or both.  \r\n\r\nIn either case, I would suggest that we have a need for both clear signals that the mechanism is broadly useful and evidence that that it is likely to be widely implemented.\r\n",
       "createdAt": "2020-01-09T04:21:20Z",
-      "updatedAt": "2020-06-17T08:04:03Z",
+      "updatedAt": "2020-07-27T20:03:39Z",
       "closedAt": null,
       "comments": [
         {
@@ -25556,6 +25571,13 @@
           "body": "I think @icing made an interesting point in https://lists.w3.org/Archives/Public/ietf-http-wg/2020AprJun/0268.html, by using as an example an H2/H3 reverse proxy in front of a legacy H1 server.\r\n\r\nFor a deployment that can only have limited concurrency between H2/H3 reverse proxy and the backend, having a guarantee that the priority signal is delivered alongside the request itself is important. That is because the processing order of requests cannot be changed once the request is being forwarded to the backend server.\r\n\r\nThis sounded to me like an argument against using a frame sent on a stream other than the request stream *for indicating initial priority*, as we do not have ordering guarantee across multiple streams in QUIC.\r\n\r\nI am not sure how strong that argument is, though at least we (H2O) provides a knob to change the backend concurrency independently from frontend concurrency to prevent attackers from issuing huge amount of requests in parallel, while providing enough concurrency to fulfill the BDP between the end-client and the reverse proxy.",
           "createdAt": "2020-06-17T08:04:02Z",
           "updatedAt": "2020-06-17T08:04:02Z"
+        },
+        {
+          "author": "ianswett",
+          "authorAssociation": "NONE",
+          "body": "Coming back to this after leave.\r\n\r\n1. The use cases I have in mind are Chrome and other clients that want to re-prioritize requests, particularly due to a change in viewport, so definitely not proprietary in anyway.  But I see there's a separate thread on the value of whether people intend to use reprioritization, so I'll catch up on that.\r\n2. At the time, people felt exposing this was too dangerous to assume, and at the very least it'd need to be confirmed with the W3C.  Even so, browsers may decide to limit its usage(ie: not allow the very highest priority/etc).\r\n\r\nI certainly can access a header, I'm just saying it adds complexity and risk to a very complex and risk-averse environment on the server side, and I can't see the value outside of a multiplexed connection.  I'm not saying we shouldn't include the header in the draft, but I don't see it as being that useful past the first hop.",
+          "createdAt": "2020-07-27T20:03:39Z",
+          "updatedAt": "2020-07-27T20:03:39Z"
         }
       ]
     },
@@ -27634,7 +27656,7 @@
       "id": "MDU6SXNzdWU1ODI3ODE0NDg=",
       "title": "fwd-protocol type",
       "url": "https://github.com/httpwg/http-extensions/issues/1141",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mnot",
       "authorAssociation": "MEMBER",
       "assignees": [],
@@ -27643,8 +27665,8 @@
       ],
       "body": "Right now `fwd-protocol` is a `sh-token`. Given that its payload is an ALPN identifier, we probably need to allow `sh-string` here too, and define an encoding. Or maybe just `sh-token` or `sh-binary` if it doesn't fit there...",
       "createdAt": "2020-03-17T06:17:23Z",
-      "updatedAt": "2020-03-17T06:17:23Z",
-      "closedAt": null,
+      "updatedAt": "2020-07-16T06:33:07Z",
+      "closedAt": "2020-07-16T06:33:07Z",
       "comments": []
     },
     {
@@ -28802,9 +28824,24 @@
       ],
       "body": "## I expect\r\n\r\nDigest to be indepentent from http/1.1 (messaging)\r\n\r\nSee https://github.com/httpwg/http-core/pull/362/files",
       "createdAt": "2020-06-01T14:44:08Z",
-      "updatedAt": "2020-06-01T14:45:17Z",
+      "updatedAt": "2020-08-04T13:58:38Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ioggstream",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@reschke iiuc the only MESSAGING-depending parts is:\r\n\r\n- https://github.com/httpwg/http-extensions/blob/master/draft-ietf-httpbis-digest-headers.md#usage-in-trailers\r\n\r\nThe spec references the term \"message body\" 3 times too, which is defined in MESSAGING.\r\nDo you think we should replace it?\r\nHow would you do it?",
+          "createdAt": "2020-08-04T08:17:01Z",
+          "updatedAt": "2020-08-04T08:17:30Z"
+        },
+        {
+          "author": "reschke",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "trailers: you may want to reference https://greenbytes.de/tech/webdav/draft-ietf-httpbis-semantics-latest.html#trailer.fields\r\n\r\nmessage body: this might be \"payload\" (https://greenbytes.de/tech/webdav/draft-ietf-httpbis-semantics-latest.html#payload)\r\n",
+          "createdAt": "2020-08-04T13:56:29Z",
+          "updatedAt": "2020-08-04T13:58:38Z"
+        }
+      ]
     },
     {
       "number": 1216,
@@ -28889,6 +28926,485 @@
       "body": "## I expect\r\n\r\nTo clarify usage of duplicate algorithms, eg. with different parameters\r\n\r\n## Instead\r\n\r\nIt is not specified\r\n\r\n## Note\r\n\r\nRFC3230 does not forbid duplicate digest-algorithm in field value, because the receiver MAY ignore one or more representation-digest eg:\r\n\r\n```\r\nDigest: sha256=bxxx.., sha256=axxx...\r\n```\r\n\r\nIn case of digest-algorithms with parameters, this is more complex. The following valid example shows a duplicate digest-algorithm `bs` with two different parameter values.\r\n\r\n```\r\nDigest: bs=axxx; p=1,    bs=bxxx; p=2\r\n```\r\n\r\nDo we need an example for that?\r\nWhich is a suitable way to define it using structured fields/headers?\r\n\r\n@LPardue ",
       "createdAt": "2020-06-18T10:09:48Z",
       "updatedAt": "2020-06-18T12:01:30Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 1227,
+      "id": "MDU6SXNzdWU2NTc5Mzc4NjE=",
+      "title": "TLS [Untrusted, Expired] Peer Certificate",
+      "url": "https://github.com/httpwg/http-extensions/issues/1227",
+      "state": "OPEN",
+      "author": "mnot-fastly",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "proxy-status"
+      ],
+      "body": "Looking at what to map x509 errors (as returned by [openssl](https://www.openssl.org/docs/manmaster/man3/X509_STORE_CTX_get_error.html) into, the most obvious one is `tls_untrusted_peer_certificate`. \r\n\r\nHowever, there's also `tls_expired_peer_certificate`, which is one of these errors. It seems odd to have these two, but not any of the many other verification errors.\r\n\r\nAt first glance, I suspect it may be better to have a single `tls_peer_certificate_verification` error, and let the `detail` convey the reason - whether it's expiration or something else.",
+      "createdAt": "2020-07-16T07:36:46Z",
+      "updatedAt": "2020-07-27T06:08:57Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "PiotrSikora",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Ultimately, there is a fine balance between providing a generic \"catch-all\" error, and enumerating all possible errors.\r\n\r\nThe linked [OpenSSL man page](https://www.openssl.org/docs/manmaster/man3/X509_STORE_CTX_get_error.html) lists 69 possible reasons for success or failure, and including all of them clearly doesn't make sense, especially when only a few of them will happen in practice.\r\n\r\nHowever, having only a generic \"catch-all\" error with the real reason \"hidden\" in a free-form text in `details`, that's going to vary from implementation to implementation, is going to make this less useful for any kind of automated processing and/or analysis.\r\n\r\nIdeally, I think, we should have specific enums that cover 95%+ of reasons happening in production, and only use the generic \"catch-all\" error for things not covered by them... So, playing the devil's advocate, perhaps we should add a few more?\r\n\r\n(Note that there is already `tls_unexpected_peer_certificate` raised on mismatched identity, SHA256, SPKI or other missed expectations.)\r\n\r\nAlso, if you can get your hands on errors happening in production, that could help us make more informed decision here.",
+          "createdAt": "2020-07-21T22:57:29Z",
+          "updatedAt": "2020-07-21T22:57:29Z"
+        },
+        {
+          "author": "mnot-fastly",
+          "authorAssociation": "NONE",
+          "body": "I agree we shouldn't do a  1:1 mapping (especially with a library), but the hierarchy needs to be clear, and mapped to terminology used in the standards. I.e., there should be a generic catch-all 'cert error' code, and then more specific ones for the major classes of problems.",
+          "createdAt": "2020-07-24T07:21:59Z",
+          "updatedAt": "2020-07-24T07:21:59Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "TLS itself also contains a pile of certificate-verification-related alerts. Although I think the set is mostly just carried over from SSL.\r\nhttps://tools.ietf.org/html/rfc8446#section-6.2\r\n\r\n```\r\n   bad_certificate:  A certificate was corrupt, contained signatures\r\n      that did not verify correctly, etc.\r\n\r\n   certificate_revoked:  A certificate was revoked by its signer.\r\n\r\n   certificate_expired:  A certificate has expired or is not currently\r\n      valid.\r\n\r\n   certificate_unknown:  Some other (unspecified) issue arose in\r\n      processing the certificate, rendering it unacceptable.\r\n\r\n   unknown_ca:  A valid certificate chain or partial chain was received,\r\n      but the certificate was not accepted because the CA certificate\r\n      could not be located or could not be matched with a known trust\r\n      anchor.\r\n\r\n   access_denied:  A valid certificate or PSK was received, but when\r\n      access control was applied, the sender decided not to proceed with\r\n      negotiation.\r\n\r\n   certificate_required:  Sent by servers when a client certificate is\r\n      desired but none was provided by the client.\r\n```\r\n\r\n@sleevi may also have some thoughts on certificate verification error-reporting.",
+          "createdAt": "2020-07-24T15:27:57Z",
+          "updatedAt": "2020-07-24T15:27:57Z"
+        },
+        {
+          "author": "sleevi",
+          "authorAssociation": "NONE",
+          "body": "Despite what libraries may provide, for their developers, [RFC 5280](https://tools.ietf.org/html/rfc5280) is fairly clear: the only defined result is a [boolean value](https://tools.ietf.org/html/rfc5280#section-6.1.6)\r\n\r\nI think coupling any protocol-level expectation about diagnostics for errors is fundamentally misaligned. It should not matter, for example, whether a particular library checks the validity period of the certificate before the signature. We know, empirically, that different libraries do very different things there: macOS vs Mozilla NSS vs Microsoft CryptoAPI each verify something like validity at different points within their verification algorithms.\r\n\r\nWe know it's deeply flawed to view there being \"the\" certificate chain for a server, because by definition, the chain is defined by the client's policy and set of trust anchors. As a consequence, we know that clients SHOULD implement certificate path building, to explore possible certificate chains, and we know that TLS 1.3 was explicitly updated to reflect those decades of running code and the emergent rough consensus that the `Certificate` message, beyond the first `Certificate`, is an attempt to aid/influence that.\r\n\r\n[RFC 4158](https://tools.ietf.org/html/rfc4158) is a huge collection of different ways verifiers can process and examine errors, during forward path building and reverse verification, and notes that the trade-offs are heavily dependent upon client and use cases.\r\n\r\nWhile I can understand the appeal for providing 'informational' statuses, any suggestion beyond a level of `MAY` is probably too normative, and unsupported by the underlying specifications and best practices.",
+          "createdAt": "2020-07-24T15:41:52Z",
+          "updatedAt": "2020-07-24T15:41:52Z"
+        },
+        {
+          "author": "mnot",
+          "authorAssociation": "MEMBER",
+          "body": "@sleevi the context here is a CDN or other reverse proxy reporting back errors in HTTP response headers, for debugging. There are no requirements around sending them (and senders are cautioned against leaking information that could aid an attacker).\r\n\r\nSo, at one end a Boolean doesn't really help, and at the other end, the full list of errors by any one library (or all of them) is impractical. \r\n\r\nThe list of alerts from @davidben seems promising, and I note that we already have [tls_error](https://httpwg.org/http-extensions/draft-ietf-httpbis-proxy-status.html#tls-error), whose value can be any TLS Alert string. However, That's intended to convey alerts _received_ (and perhaps we should communicate that more clearly). \r\n\r\nThe desired semantics here are that the problem indicated by the alert is generated _in the client itself_, not received by it. \r\n\r\nThat leads me to believe that there are two viable paths forward:\r\n\r\n1. Rearrange the `tls_*` errors so that they mirror the alerts above (leaving `tls_error`'s semantic as stated above); e.g., we'd have `tls_bad_certificate`, `tls_certificate_revoked`, `tls_certificate_unknown` and so forth\r\n\r\n2. Reduce everything into two errors, `tls_error_received` and `tls_error_generated` or similar. Both would carry the TLS Alert value as an additional payload item.\r\n\r\nI think the difference is mostly stylistic, so @PiotrSikora and I can figure that out. The bigger question is whether this is the right set of errors to focus upon.",
+          "createdAt": "2020-07-27T03:57:45Z",
+          "updatedAt": "2020-07-27T03:57:45Z"
+        },
+        {
+          "author": "sleevi",
+          "authorAssociation": "NONE",
+          "body": "> So, at one end a Boolean doesn't really help, and at the other end, the full list of errors by any one library (or all of them) is impractical.\r\n\r\nBut I think this is missing an important detail: from the perspective of a client, the only stable output is the boolean. For example, OpenSSL's reporting of errors is symptomatic of deeper flaws within its certificate verification; fixing those errors necessarily means some existing errors can't effectively be reported. This is covered at some length in [RFC 4158, Section 3.2](https://tools.ietf.org/html/rfc4158#section-3.2).\r\n\r\nUltimately, the set of errors that are relevant are, to an extent, subject to local policy: it's rare for certificate validators to think of errors in the ontology laid out by the TLS layer. Typically, a client just does a \"best guess\" (or just maps straight to `bad_certificate`) when trying to map to the TLS layer, in part so it doesn't disclose extra information. This is certainly true when you think about local policy, such as limits on validity or the requirement of associated metadata, potentially delivered over TLS, such as Certificate Transparency or OCSP Must-Staple.\r\n\r\nI think the core question is whether you expect the client and the proxy to be in the same management domain. If they aren't, and the ED seems to be oriented around this scenario (where server and proxy are likely same administrative domain, but proxy and client aren't), then it seems better served as an opaque diagnostic string. As RFC 4158 calls out, beyond the 'boolean' is really just an administrative/diagnostic capability, not something meant to be semantically rich, meaningful, or stable, and certainly not to allow next-hop policy decision making.",
+          "createdAt": "2020-07-27T04:11:33Z",
+          "updatedAt": "2020-07-27T04:11:33Z"
+        },
+        {
+          "author": "mnot",
+          "authorAssociation": "MEMBER",
+          "body": "Just to be clear - the user agent isn't involved in this at all, beyond receiving the header so as to make it available to someone diagnosing a problem (Likely someone from the origin, from the CDN/reverse proxy operator, and/or a help desk talking to an end user).\r\n\r\nWhat I think I hear you saying is that we should define a generic error and allow implementations to convey textual detail in it. Does that make sense? \r\n\r\nI also still see some value in distinguishing a TLS alert received from the origin by the proxy (in its role as TLS client) from this case (a problem it encounters *as* a TLS client).",
+          "createdAt": "2020-07-27T05:22:58Z",
+          "updatedAt": "2020-07-27T05:22:58Z"
+        },
+        {
+          "author": "sleevi",
+          "authorAssociation": "NONE",
+          "body": "> What I think I hear you saying is that we should define a generic error and allow implementations to convey textual detail in it. Does that make sense?\r\n\r\nYes. This matches with Criterion 2 of https://tools.ietf.org/html/rfc4158#section-2.2 and the dual mode trade-off in https://tools.ietf.org/html/rfc4158#section-3.2 , which perhaps more clearly highlights the local policy aspect (\"Ultimately, the developer determines how to handle the trade-off between efficiency and provision of information\").\r\n\r\n> I also still see some value in distinguishing a TLS alert received from the origin by the proxy (in its role as TLS client) from this case (a problem it encounters _as_ a TLS client).\r\n\r\n100% agreed here. I was only commenting to the extent at which the proxy validates the peer certificate independent of the TLS layer framing. Perhaps poorly stated, but my comment in https://github.com/httpwg/http-extensions/issues/1227#issuecomment-664108708 was trying to capture that Option 2 from https://github.com/httpwg/http-extensions/issues/1227#issuecomment-664105951 (`tls_error_generated`) would likely just reduce to a boolean anyways, in a well-behaved TLS client.",
+          "createdAt": "2020-07-27T06:08:56Z",
+          "updatedAt": "2020-07-27T06:08:56Z"
+        }
+      ]
+    },
+    {
+      "number": 1228,
+      "id": "MDU6SXNzdWU2NTc5MzkzODI=",
+      "title": "Make it more clear what to do with read and write errors",
+      "url": "https://github.com/httpwg/http-extensions/issues/1228",
+      "state": "CLOSED",
+      "author": "mnot-fastly",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "proxy-status"
+      ],
+      "body": "Right now the likely candidates are `connection_terminated` and `http_incomplete_response`, but it's not obvious, and also this depends on the implementation knowing whether the response has started yet or not -- which may be difficult to retrofit onto an existing implementation. ",
+      "createdAt": "2020-07-16T07:38:54Z",
+      "updatedAt": "2020-07-24T07:23:26Z",
+      "closedAt": "2020-07-24T07:23:25Z",
+      "comments": [
+        {
+          "author": "PiotrSikora",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Well, proxies must know that anyway, since if the response has already started and HTTP headers were already sent, then the only way to transmit this information in `Proxy-Status` is via HTTP trailers.",
+          "createdAt": "2020-07-21T23:18:52Z",
+          "updatedAt": "2020-07-21T23:18:52Z"
+        },
+        {
+          "author": "mnot-fastly",
+          "authorAssociation": "NONE",
+          "body": "Ah, good point - never mind.",
+          "createdAt": "2020-07-24T07:23:25Z",
+          "updatedAt": "2020-07-24T07:23:25Z"
+        }
+      ]
+    },
+    {
+      "number": 1229,
+      "id": "MDU6SXNzdWU2NTc5Mzk4OTM=",
+      "title": "Proxy configuration error",
+      "url": "https://github.com/httpwg/http-extensions/issues/1229",
+      "state": "CLOSED",
+      "author": "mnot-fastly",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "proxy-status"
+      ],
+      "body": "Right now the only way to indicate bad configuration is `proxy_internal_error`, which isn't terribly helpful.",
+      "createdAt": "2020-07-16T07:39:40Z",
+      "updatedAt": "2020-08-04T05:05:17Z",
+      "closedAt": "2020-08-04T05:05:17Z",
+      "comments": [
+        {
+          "author": "PiotrSikora",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Could you elaborate on the use case here? I think `proxy_internal_error` should be fine for misconfiguration errors that we don't want to advertise (e.g. fleet-wide misconfiguration that broke the Internet), but perhaps we could use something else for customer-provided configuration that breaks proxying for a specific hostname? Is that what you had in mind?",
+          "createdAt": "2020-07-21T23:00:49Z",
+          "updatedAt": "2020-07-21T23:00:49Z"
+        },
+        {
+          "author": "mnot-fastly",
+          "authorAssociation": "NONE",
+          "body": "Yes, exactly.",
+          "createdAt": "2020-07-24T07:22:49Z",
+          "updatedAt": "2020-07-24T07:22:49Z"
+        }
+      ]
+    },
+    {
+      "number": 1230,
+      "id": "MDU6SXNzdWU2NTc5NDAzMTI=",
+      "title": "Missing server certificate",
+      "url": "https://github.com/httpwg/http-extensions/issues/1230",
+      "state": "CLOSED",
+      "author": "mnot-fastly",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "proxy-status"
+      ],
+      "body": "for parity with other errors",
+      "createdAt": "2020-07-16T07:40:16Z",
+      "updatedAt": "2020-07-24T07:22:34Z",
+      "closedAt": "2020-07-24T07:22:34Z",
+      "comments": [
+        {
+          "author": "PiotrSikora",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I don't believe that this can happen at the TLS level (i.e. talking to a TLS server without a certificate).",
+          "createdAt": "2020-07-21T22:35:24Z",
+          "updatedAt": "2020-07-21T22:35:24Z"
+        },
+        {
+          "author": "mnot-fastly",
+          "authorAssociation": "NONE",
+          "body": "Will have to double-check (I came across it as a distinct error code), but #1227 probably makes this unnecessary. Closing. ",
+          "createdAt": "2020-07-24T07:22:34Z",
+          "updatedAt": "2020-07-24T07:22:34Z"
+        }
+      ]
+    },
+    {
+      "number": 1231,
+      "id": "MDU6SXNzdWU2NjEyMzY5NTg=",
+      "title": "Escape valve for implementation-specific info",
+      "url": "https://github.com/httpwg/http-extensions/issues/1231",
+      "state": "CLOSED",
+      "author": "mnot",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [
+        "cache-header"
+      ],
+      "body": "`details` or similar; maybe an inner-list?",
+      "createdAt": "2020-07-20T01:19:16Z",
+      "updatedAt": "2020-08-04T07:19:23Z",
+      "closedAt": "2020-08-04T07:19:23Z",
+      "comments": []
+    },
+    {
+      "number": 1232,
+      "id": "MDU6SXNzdWU2NjMyMTMxNjY=",
+      "title": "Nice to have guidance about reponding to priority signals when received",
+      "url": "https://github.com/httpwg/http-extensions/issues/1232",
+      "state": "OPEN",
+      "author": "LPardue",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [
+        "priorities"
+      ],
+      "body": "On https://lists.w3.org/Archives/Public/ietf-http-wg/2020JulSep/0063.html @ekinnear provided some feedback:\r\n\r\n> For the document as a whole, we\u2019ve gotten some feedback internally that it would be really nice if there were some (minimal, recommendation only) guidance as to how to respond to the priority signals when received. This wouldn\u2019t be restrictive, as we\u2019re really excited to experiment here and see what awesome results we can achieve, but having a baseline of \u201cimplement this as written and you\u2019ll do okay\u201d might be worth considering to increase the likelihood that we have a large group of generally-performant implementations.\r\n> \r\n> An example here would be if two requests of the same urgency arrive back-to-back, the first with the incremental bit set and the second without. What gets sent when? What do you do next if a third request arrives with the incremental bit also set before the first is complete? There are lots and lots of permutations, but a general approach of handling new items coming in is something that I think we\u2019ve all been imagining during discussions, but we haven\u2019t really written it down explicitly. Internally, as we discussed with some folks new to the topic, we discovered that our imaginations of what to do in cases like these didn\u2019t actually align as well as we thought.\r\n\r\nI'm wondering how much this crosses over with https://github.com/httpwg/http-extensions/issues/1216, and how the editors might choose to address this feedback.",
+      "createdAt": "2020-07-21T18:15:51Z",
+      "updatedAt": "2020-07-30T04:13:30Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "I think everyone is in agreement how it should work if everything is incremental (round-robin), or everything is non-incremental (sequential delivery). The question is when they are mixed at the same urgency level.\r\n\r\nOur goal is that client can signal incremental whenever it make sense without worrying about regressions. Let's imagine two cases:\r\n\r\n1. At the same urgency level, a huge non-incremental file download has started, then a small incremental resource is requested.\r\n2. At the same urgency level, an incremental hanging GET is waiting for response, while a non-incremental file download is requested.\r\n\r\nMany proposed solutions would severely regress these cases, delaying delivery of resources or keeping the connection idle.",
+          "createdAt": "2020-07-24T20:38:06Z",
+          "updatedAt": "2020-07-24T20:38:52Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "A solution I want to propose to always perform round robin: For example, if there are 2 incremental loads and 3 non-incremental loads at the same urgency level, we perform round robin with 5 slots, 1 for each incremental load, and the remaining 3 for the first non-incremental load that has data available.\r\n\r\nThis generalizes the model and would be least disruptive in my opinion.",
+          "createdAt": "2020-07-24T20:38:26Z",
+          "updatedAt": "2020-07-24T20:38:26Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "If everything is served round-robin, then there is no point having an increment distinguisher. Or am I missing something?",
+          "createdAt": "2020-07-24T20:53:43Z",
+          "updatedAt": "2020-07-24T20:53:43Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "Non-incremental stream is handled differently in my suggested round-robin scheme. I'll describe example above in more detail:\r\n\r\n5 streams at the same urgency level. Stream 0, 1, 2 are non-incremental, stream 3, 4 are incremental.\r\n\r\nWe would have 5 slots, 3 of which is dedicated to the first non-incremental stream with data available, which is stream 0. Other two slots are for stream 3 and 4.\r\n\r\nLet's stream 0 is blocked waiting for server application to generate data. All its 3 slots would be used by the next non-incremental stream in the queue which is stream 1.\r\n\r\nThis round-robin scheme degenerates into sequential delivery when all streams are non-incremental, and degenerates into regular round-robin when all streams are incremental.",
+          "createdAt": "2020-07-25T19:04:10Z",
+          "updatedAt": "2020-07-25T19:04:10Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "This sounds a bit like Pat Meenan's scheme, which we decided we didn't\nneed. It does differ in so far as being an implementation choice rather\nthan a signal.\n\nWhen you say slots are you thinking time or bytes?\n\nWould it be better to send incremental streams first?\n\nOn Sat, 25 Jul 2020, 20:04 Guoye Zhang, <notifications@github.com> wrote:\n\n> Non-incremental stream is handled differently in my suggested round-robin\n> scheme. I'll describe example above in more detail:\n>\n> 5 streams at the same urgency level. Stream 0, 1, 2 are non-incremental,\n> stream 3, 4 are incremental.\n>\n> We would have 5 slots, 3 of which is dedicated to the first\n> non-incremental stream with data available, which is stream 0. Other two\n> slots are for stream 3 and 4.\n>\n> Let's stream 0 is blocked waiting for server application to generate data.\n> All its 3 slots would be used by the next non-incremental stream in the\n> queue which is stream 1.\n>\n> This round-robin scheme degenerates into sequential delivery when all\n> streams are non-incremental, and degenerates into regular round-robin when\n> all streams are incremental.\n>\n> \u2014\n> You are receiving this because you authored the thread.\n> Reply to this email directly, view it on GitHub\n> <https://github.com/httpwg/http-extensions/issues/1232#issuecomment-663889717>,\n> or unsubscribe\n> <https://github.com/notifications/unsubscribe-auth/ABSELNKA7Q5ZNHX4FY2S4YLR5MUDNANCNFSM4PD3T6VA>\n> .\n>\n",
+          "createdAt": "2020-07-25T19:57:12Z",
+          "updatedAt": "2020-07-25T19:57:12Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "> When you say slots are you thinking time or bytes?\r\n\r\nIn ideal conditions, time and bytes are equivalent. I think whatever definition of \"slot\" implementations are using in plain round robin scheme would work, so I don't have a preference.\r\n\r\n> Would it be better to send incremental streams first?\r\n\r\nThat would work if it solves the second scenario I described above (incremental hanging GET followed by non-incremental file download).\r\n\r\nHowever, it creates unfairness between incremental and non-incremental streams. I think the goal is that client can opt in to non-incremental whenever it makes sense. For example, if JSON responses can only be processed after received in full, they can be marked non-incremental; images can be rendered progressively, so they are incremental. But it's not our intention that images preempt JSON.",
+          "createdAt": "2020-07-25T20:43:33Z",
+          "updatedAt": "2020-07-25T20:43:33Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "Where I'm coming from is that we own a client API, and we have convenience mode where you receive the entire response in one callback, and advanced mode where you receive data in chunks. We currently automatically opt in to non-incremental delivery when convenience mode is used. However, that wouldn't be safe if this causes any unfairness.",
+          "createdAt": "2020-07-25T20:56:56Z",
+          "updatedAt": "2020-07-25T20:56:56Z"
+        },
+        {
+          "author": "kazuho",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Regarding how to handle mixture of incremental and non-incremental requests, I think there could be various strategies that can be adopted.\r\n\r\nTo give an example, as stated in https://github.com/kazuho/draft-kazuho-httpbis-priority/issues/94#issuecomment-572032461, when the server knows that the first few bytes of the responses are more important than the remainder (consider progressive JPEG), it makes sense for the server to send the first few bytes of those responses before other non-incremental responses.\r\n\r\nOr, when the server knows that the response cannot be processed incrementally, there is no reason for the server to interleave some bytes of that response with others. A prominent example of such response is a zip file. A zip file cannot be processed until it is completely downloaded, because the central directory exists at the end of the file.\r\n\r\nConsidering these examples, I tend to think that recommending one behavior would not be very helpful. Priorities indicated by clients are merely hints, my preference goes to allowing servers to do whatever they think are beneficial, using various hints where the extensible priorities being _one_ of them.",
+          "createdAt": "2020-07-28T14:52:27Z",
+          "updatedAt": "2020-07-28T14:54:41Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I better understand @guoye-zhang's concern. I'll attempt a PR that describes the general problem in order to inform readers of pitfalls and recommend they avoid them. I don't think we want to be specific about how to do that. ",
+          "createdAt": "2020-07-28T19:01:38Z",
+          "updatedAt": "2020-07-28T19:01:38Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "I think there is still value in providing an example algorithm. The problem is nuanced enough that it'd be difficult to address all corner cases in a first attempt. The algorithm I proposed does not depend on any server heuristics of content type or even content length. It provides a low bar of \"you'd be fine if you don't want to think about it and just implement this\". You can totally discard it and implement whatever heuristics you want since it's just a hint, but it should be at least as good as this.",
+          "createdAt": "2020-07-29T07:26:22Z",
+          "updatedAt": "2020-07-29T07:26:22Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "In my experience, many implementers will just assume an example is the correct single solution. If clients assume too much about servers behaving a certain way, it can cause problems. \r\n\r\nWe have little broad data to back it up athink it is single recommendation, which worries me. I  better to highlight the nuances and pitfalls.",
+          "createdAt": "2020-07-29T09:10:43Z",
+          "updatedAt": "2020-07-29T09:10:43Z"
+        },
+        {
+          "author": "kazuho",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "What @LPardue says. If we are to suggest some type of logic, it has to work well across the board.\r\n\r\nI see at least three logics being discussed in this issue, that are to be used when the only hint given to the server is the extensible priority signals:\r\n1. divide the bandwidth between incremental and non-incremental responses based on their numbers (https://github.com/httpwg/http-extensions/issues/1232#issuecomment-663724301)\r\n2. serve incremental responses first, then the non-incremental ones (https://github.com/httpwg/http-extensions/issues/1232#issuecomment-663896182)\r\n3. first few bytes of incremental responses are given priority above non-incremental requessts, the remainders are given lower precedence (https://github.com/kazuho/draft-kazuho-httpbis-priority/issues/94#issuecomment-572032461, linked from https://github.com/httpwg/http-extensions/issues/1232#issuecomment-665087636)\r\n\r\nAssuming that the goal of prioritization is to maximize the amount of meaningful output provided to the user at earlier moments, both (1) and (2) have downsides.\r\n\r\nThe problem with (1) is that it devotes some bandwidth to non-incremental responses when incremental responses are inflight. During the early stages of a connection, spending all available bandwidth on incremental responses is beneficial, because a server can assume that sending *some* portion of the response provides benefit to the user, if that response can be processed incrementally. To give an example, sending 10% of 5 incremental responses is better than sending 50% of a non-incremental response.\r\n\r\nIn contract, (2) suffers during the mid stages of a connection, because it significantly delays the transfer of non-incremental responses. As an example, when a non-incremental response carrying a JSON file and an incremental response carrying a progressive JPEG image is competing at the same urgency level, it is natural to assume that completing the transfer of the JSON file is more important than completing the transfer of the progressive JPEG image.\r\n\r\nAs can be seen, my point is that the significant of sending a byte changes during the stages of a connection, or between the byte ranges of each response, if the response is incremental. That is why I tend to prefer (3), though the downside is that the logic is bit complex.\r\n\r\nAnd going back to my previous point, this whole discussion is about servers not using other knowledge that are likely to be available. It could well be the case that the server could make better decision, had it been given the knowledge that the application has.\r\n\r\nThat's why I tend to think that suggesting pitfalls (and the possibility of using other signals) is the answer here.",
+          "createdAt": "2020-07-29T23:46:37Z",
+          "updatedAt": "2020-07-29T23:46:37Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "@kazuho I agree with you that server should be more intelligent about data delivery if it has more knowledge about the content. However, it still needs a fallback algorithm when other sources of signaling are not available, for example if a new application sends a new image format that it does not understand. 10% is a good heuristic for JPG, but might not be applicable for, for example, streaming video files, as stalling at 10% would not be ideal.\r\n\r\nYour argument that \"10% of 5 incremental responses is better than sending 50% of a non-incremental response\" is completely valid. I'd even say that completing 99% of non-incremental response is equivalent to completing 0%. However, percentage is only part the story. Let's consider a situation where incremental response is 1MB and non-incremental response is 1KB, do we send 1KB after 10% of 1MB? Round-robin is a safe default. There might also be cases where we don't know the length ahead of time.\r\n\r\nThe question that matters to me is \"Is this algorithm worse than not supporting incremental-signaling at all?\" I'd be happy to support other algorithms if they can achieve this (not being worse).",
+          "createdAt": "2020-07-30T02:18:45Z",
+          "updatedAt": "2020-07-30T02:18:45Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "The answer could also be \"if there is a single incremental response, all responses at the same urgency level are treated as incremental and just keep reusing your existing server heuristics\"",
+          "createdAt": "2020-07-30T02:46:34Z",
+          "updatedAt": "2020-07-30T02:46:34Z"
+        },
+        {
+          "author": "kazuho",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> The question that matters to me is \"Is this algorithm worse than not supporting incremental-signaling at all?\"\r\n\r\nIIRC, at one point there was discussion regarding if we need incremental flag at all. Note that Chrome does not use weight-based prioritization at all in H2. Based on these points, I tend to think that it would not be that terrible for a server to not support incremental signaling at all, or to not do incremental when the responses being served are mixed.",
+          "createdAt": "2020-07-30T03:37:01Z",
+          "updatedAt": "2020-07-30T03:37:01Z"
+        },
+        {
+          "author": "guoye-zhang",
+          "authorAssociation": "NONE",
+          "body": "Ability to mark all resources non-incremental is critical for Low Latency HLS, so I'd say it is very useful for us.\r\n\r\nOverall, I just want to get a sense of if:\r\n1. Incremental-signaling significantly changes how resources are delivered, and in some cases negatively, so don't change it unless you are absolutely sure what you're doing.\r\n2. Incremental-signaling significantly changes how resources are delivered, but it is well-thought-out and with all corner cases considered, so you can set it wherever it makes sense.\r\n3. Incremental-signaling is just a hint and mostly ignored by servers, setting it will probably be fine.",
+          "createdAt": "2020-07-30T04:13:30Z",
+          "updatedAt": "2020-07-30T04:13:30Z"
+        }
+      ]
+    },
+    {
+      "number": 1233,
+      "id": "MDU6SXNzdWU2NjQ2NjE2NDQ=",
+      "title": "RFC 6265bis: Specify how non-HTTP cookies should be exposed to sites",
+      "url": "https://github.com/httpwg/http-extensions/issues/1233",
+      "state": "OPEN",
+      "author": "DCtheTall",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [
+        "6265bis"
+      ],
+      "body": "Currently, 6265bis only really talks about storing cookies that come from non-HTTP sources (e.g. document.cookie, CookieStore), but there is nothing in the spec about what cookies should be included in non-HTTP reads except that HttpOnly cookies should be ignored.\r\n\r\nThis lack of guidance has led to some [disagreements between browsers](https://github.com/httpwg/http-extensions/issues/1163) about whether `SameSite=AnythingButNone` cookies should be accessible in cross-origin frames.\r\n\r\nI am opening this issue to start a discussion about whether non-HTTP cookie access is in scope of 6265bis, and if so, what changes should be made to the spec.",
+      "createdAt": "2020-07-23T17:53:18Z",
+      "updatedAt": "2020-07-24T16:26:01Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "DCtheTall",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "CC @mikewest ",
+          "createdAt": "2020-07-23T17:54:44Z",
+          "updatedAt": "2020-07-23T17:54:44Z"
+        },
+        {
+          "author": "mikewest",
+          "authorAssociation": "MEMBER",
+          "body": "It certainly needs to be defined somewhere. It might well make sense for HTML to define some filtering mechanism for the particular set of user agents that care about HTML (along with its definition of `document.cookie`), but I expect that definition to require some infrastructure in this document to support it.",
+          "createdAt": "2020-07-24T06:58:35Z",
+          "updatedAt": "2020-07-24T06:58:35Z"
+        },
+        {
+          "author": "DCtheTall",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> but I expect that definition to require some infrastructure in this document to support it.\r\n\r\n@mikewest can you elaborate?",
+          "createdAt": "2020-07-24T13:34:32Z",
+          "updatedAt": "2020-07-24T13:34:45Z"
+        },
+        {
+          "author": "chlily1",
+          "authorAssociation": "NONE",
+          "body": "Another consideration is that the definition in `5.2.  \"Same-site\" and \"cross-site\" Requests` applies to \"requests\" and is defined in terms of the \"request's client\", IIUC as defined in Fetch, which doesn't really cover cookie accesses from non-HTTP APIs. This part may also need to be reformulated to cover non-HTTP APIs.",
+          "createdAt": "2020-07-24T16:26:01Z",
+          "updatedAt": "2020-07-24T16:26:01Z"
+        }
+      ]
+    },
+    {
+      "number": 1234,
+      "id": "MDU6SXNzdWU2NjQ2NjE4Mjk=",
+      "title": "RFC 6265bis: Specify that empty name and empty value cookies should be ignored in 5.4",
+      "url": "https://github.com/httpwg/http-extensions/issues/1234",
+      "state": "CLOSED",
+      "author": "DCtheTall",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [
+        "6265bis"
+      ],
+      "body": "Currently according to the spec, any cookies set with a `Set-Cookie` header should be ignored if their name *and* value are empty. However, this check is not applied in section 5.4 of the spec, and as a result the CookieStore had a [bug](https://github.com/WICG/cookie-store/issues/149) allowed for sites to work around this check.\r\n\r\nTo me, this is a symptom of a bigger issue: 6265bis treats non-HTTP cookies as an afterthought, [e.g. not specifying how non-HTTP cookies should be accessed other than to ignore `HttpOnly` cookies](https://github.com/httpwg/http-extensions/issues/1233).\r\n\r\nI think it's worth opening a separate issue just to track whether we add the empty-name-empty-value check to 5.4 of 6265bis, and if there are other checks on the `Set-Cookie` header in 5.3 that are implied in 5.4 but not made explicit.",
+      "createdAt": "2020-07-23T17:53:37Z",
+      "updatedAt": "2020-07-28T15:41:17Z",
+      "closedAt": "2020-07-28T15:41:17Z",
+      "comments": [
+        {
+          "author": "DCtheTall",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "CC @mikewest",
+          "createdAt": "2020-07-23T17:54:37Z",
+          "updatedAt": "2020-07-23T17:54:37Z"
+        },
+        {
+          "author": "mikewest",
+          "authorAssociation": "MEMBER",
+          "body": "As you've noticed, the document currently assumes that 5.4 is only going to be exercised after 5.3. I think this particular issue is distinct from the issue you raise in the other bug, as the only non-HTTP APIs that existed before the async API you're working through used cookie strings, which were parsed just as the header was.\r\n\r\nGiven that new mechanism, it does make sense to move \"If both the name string and the value string are empty, ignore the set-cookie-string entirely.\" from 5.3 to 5.4. Skimming through, I think that's the only restriction that causes cookies to be ignored at the parsing stage.",
+          "createdAt": "2020-07-24T06:58:47Z",
+          "updatedAt": "2020-07-24T06:58:47Z"
+        }
+      ]
+    },
+    {
+      "number": 1237,
+      "id": "MDU6SXNzdWU2Njc1MjYwMDc=",
+      "title": "Reference(s) for certificate verification",
+      "url": "https://github.com/httpwg/http-extensions/issues/1237",
+      "state": "OPEN",
+      "author": "mnot",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [
+        "bcp56bis"
+      ],
+      "body": "BCP56bis currently states that 'Applications using HTTP should specify that TLS certificates are to be checked according to [RFC2818] when HTTPS is used.' That doesn't seem right.\r\n\r\nRelated: https://github.com/httpwg/http-core/issues/404  and https://github.com/httpwg/http-core/issues/263\r\n\r\n/cc @ekr @stpeter @davidben @sleevi\r\n\r\n",
+      "createdAt": "2020-07-29T03:49:29Z",
+      "updatedAt": "2020-07-29T03:49:29Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 1238,
+      "id": "MDU6SXNzdWU2Njk4OTU5NDM=",
+      "title": "Clearing Client Hint preferences with browser history seems odd",
+      "url": "https://github.com/httpwg/http-extensions/issues/1238",
+      "state": "OPEN",
+      "author": "amtunlimited",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> User agents MUST clear persisted opt-in preferences when any one of site data, browsing history, browsing cache, cookies, or similar, are cleared.\r\n\r\nBrowsing history seems to stand out to me here. There are a couple of pedantic questions (does this mean full history, or back beyond a certain amount of time?) and doesn't seem to fit with precedent. In general, I don't expect much other information to be cleared when removing history information, but that might very well just be me.",
+      "createdAt": "2020-07-31T14:49:44Z",
+      "updatedAt": "2020-07-31T16:34:26Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I agree the text seems a bit overprescriptive here. I could imagine UAs that want to clear it with browsing history and UAs that don't, depending on what they're trying to accomplish. It's a question of which \"please forget this\" use cases the browser is aiming to meet with each option.\r\n\r\nPerhaps the UA has an option whose aim is \"please make this site forget about me\". Then the UA should clear client hint preferences, site data, and cache, but may or may not decide history is separate. (Assuming the history is not web-visible!) Or perhaps the aim is \"I don't want these links to appear in address bar completions\". Then perhaps the UA will clear just history but not any site data because the user didn't ask to be logged out. Or perhaps the UA wants to combine these two into one option. Or perhaps the option is for developers, to clear particular pieces of cache to diagnose some issue. Then maybe the client hint cache should be cleared or maybe the option is just about the HTTP cache.\r\n\r\nIdeally the text would capture enough that UAs can make the correct decision for each of their features. (And, since it has privacy implications when UAs forget, probably explicitly call out clearing this in \"please make this site forget about me\" cases like clearing cookies and site data.)",
+          "createdAt": "2020-07-31T16:34:26Z",
+          "updatedAt": "2020-07-31T16:34:26Z"
+        }
+      ]
+    },
+    {
+      "number": 1240,
+      "id": "MDU6SXNzdWU2NzI1MjAxMjM=",
+      "title": "Give guidance about how to choose an error code",
+      "url": "https://github.com/httpwg/http-extensions/issues/1240",
+      "state": "OPEN",
+      "author": "mnot",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [
+        "proxy-status"
+      ],
+      "body": "",
+      "createdAt": "2020-08-04T05:39:53Z",
+      "updatedAt": "2020-08-04T05:39:53Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 1241,
+      "id": "MDU6SXNzdWU2NzM1OTk0Njk=",
+      "title": "Incrementally Better Cookies vs RFC6265bis",
+      "url": "https://github.com/httpwg/http-extensions/issues/1241",
+      "state": "OPEN",
+      "author": "annevk",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Could someone please explain the history behind why we have two drafts (https://tools.ietf.org/html/draft-west-cookie-incrementalism and https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis) that are somewhat incompatible with each other? Could the proposals that have support from the WG move into RFC6265bis?",
+      "createdAt": "2020-08-05T14:49:01Z",
+      "updatedAt": "2020-08-05T14:51:48Z",
       "closedAt": null,
       "comments": []
     }
@@ -46815,10 +47331,17 @@
       ],
       "body": "",
       "createdAt": "2019-01-28T06:27:04Z",
-      "updatedAt": "2020-03-17T06:55:13Z",
+      "updatedAt": "2020-08-05T00:17:21Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "8740db5485b7f15911fd52e6859716ea685a50fe",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "reschke-cache-header-1",
+      "headRefOid": "21cac3a064fc2d86b0e0a869a44a7934adf219ac",
       "closedAt": "2020-03-17T06:55:13Z",
       "mergedAt": null,
       "mergedBy": null,
+      "mergeCommit": null,
       "comments": [
         {
           "author": "mcmanus",
@@ -46842,14 +47365,7 @@
           "updatedAt": "2019-11-21T06:19:40Z"
         }
       ],
-      "reviews": [],
-      "baseRepository": "httpwg/http-extensions",
-      "baseRefName": "master",
-      "baseRefOid": "8740db5485b7f15911fd52e6859716ea685a50fe",
-      "headRepository": "httpwg/http-extensions",
-      "headRefName": "reschke-cache-header-1",
-      "headRefOid": "21cac3a064fc2d86b0e0a869a44a7934adf219ac",
-      "mergeCommit": null
+      "reviews": []
     },
     {
       "number": 770,
@@ -56690,7 +57206,7 @@
       ],
       "body": "## This PR\r\n\r\nAs `priority` header is end-to-end, where applicable\r\nI used \"origin server\" and \"user agent\".\r\n\r\nFixes: #1016 \r\n\r\n## Notes\r\n\r\nThere might be other occurrencies to replace. Let me know if the current ones are correct.",
       "createdAt": "2020-01-28T14:37:27Z",
-      "updatedAt": "2020-05-26T20:18:04Z",
+      "updatedAt": "2020-08-05T00:17:03Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "c4f610929f67ec7ea417438070cc7dc6557d78d7",
@@ -58634,10 +59150,17 @@
       ],
       "body": "@ioggstream I've taken an editorial stab at juggling the document a bit in order to improve its presentation and readability. It's still a bit WIP.\r\n\r\nThis is mainly just borrowing text from different places, and eliding some duplication. However, I may have inadvertently made changes or ommissions so PTAL and tell me.\r\n\r\nNote it builds on top of #1086, so you might find it easier to compare the single commit https://github.com/httpwg/http-extensions/commit/43529457c31d4d660027d782ec2fff2b0466e767",
       "createdAt": "2020-03-03T20:50:55Z",
-      "updatedAt": "2020-03-08T20:16:01Z",
+      "updatedAt": "2020-08-05T00:17:06Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "2f0c688218ae2b933c4abd04cc587192ba0f94e3",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "lucas/editorial-reordering",
+      "headRefOid": "40499050840fc76b770c39d735bdf24cfcc459c3",
       "closedAt": "2020-03-08T20:16:01Z",
       "mergedAt": null,
       "mergedBy": null,
+      "mergeCommit": null,
       "comments": [
         {
           "author": "LPardue",
@@ -58738,14 +59261,7 @@
             }
           ]
         }
-      ],
-      "baseRepository": "httpwg/http-extensions",
-      "baseRefName": "master",
-      "baseRefOid": "2f0c688218ae2b933c4abd04cc587192ba0f94e3",
-      "headRepository": "httpwg/http-extensions",
-      "headRefName": "lucas/editorial-reordering",
-      "headRefOid": "40499050840fc76b770c39d735bdf24cfcc459c3",
-      "mergeCommit": null
+      ]
     },
     {
       "number": 1094,
@@ -59948,19 +60464,19 @@
       "labels": [],
       "body": "## This PR\r\n\r\nContains a main editorial rewording and reodering under the Digest section.",
       "createdAt": "2020-03-06T13:31:24Z",
-      "updatedAt": "2020-03-06T18:10:01Z",
-      "closedAt": "2020-03-06T18:10:01Z",
-      "mergedAt": null,
-      "mergedBy": null,
-      "comments": [],
-      "reviews": [],
+      "updatedAt": "2020-08-05T00:17:08Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "6a9487b9772a10f38a515aed99ed4915aafcd030",
       "headRepository": "httpwg/http-extensions",
       "headRefName": "ioggstream-1103-refactor-header",
       "headRefOid": "07f7ddc67c92309818a6a18b61473e3dd498151d",
-      "mergeCommit": null
+      "closedAt": "2020-03-06T18:10:01Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     },
     {
       "number": 1120,
@@ -60016,19 +60532,19 @@
       "labels": [],
       "body": "## This PR\r\n\r\njust shows an hypothesis",
       "createdAt": "2020-03-06T16:16:16Z",
-      "updatedAt": "2020-03-06T18:10:35Z",
-      "closedAt": "2020-03-06T18:10:35Z",
-      "mergedAt": null,
-      "mergedBy": null,
-      "comments": [],
-      "reviews": [],
+      "updatedAt": "2020-08-05T00:17:09Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "47a4a965efe1bae6eaf4331553cf2db7b960aa42",
       "headRepository": "httpwg/http-extensions",
       "headRefName": "ioggstream-1103-test",
       "headRefOid": "22f7d01320c13fb9391c6c310bc474da14ed9922",
-      "mergeCommit": null
+      "closedAt": "2020-03-06T18:10:35Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     },
     {
       "number": 1122,
@@ -62532,10 +63048,17 @@
       ],
       "body": "This is a follow up to the PRIORITY_UPDATE tweaks in https://github.com/httpwg/http-extensions/pull/1167\r\n\r\nIn this PR we acknowledge that some people would like to use a frame to signal the initial priority, so we define a new frame INITIAL_PRIORITY that is sent on the request or push stream.\r\n\r\nI can't recall if we thought this would work for HTTP/2, so I've only defined the frame in HTTP/3. Hoping to resolve that either in this PR or in later discussion.\r\n\r\nSomething to look out for, compared to the PRIORITY_UPDATE frame, I've allowed this to be sent by either endpoint, so that it mirrors the flexibility of the header.\r\n\r\nSince having two ways to do something means that there will inevitable be an endpoint that chooses to use both signals at the same time, I've added some text to discuss it. ",
       "createdAt": "2020-04-30T13:52:54Z",
-      "updatedAt": "2020-05-04T13:52:00Z",
+      "updatedAt": "2020-08-05T00:17:11Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "f40438f4582d1fdb5b894f382ce341686e38e7c3",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "initial-priority-frame",
+      "headRefOid": "02ca4f3eccaf5d116b17eb501c9d5c92cc6073d0",
       "closedAt": "2020-05-04T13:52:00Z",
       "mergedAt": null,
       "mergedBy": null,
+      "mergeCommit": null,
       "comments": [
         {
           "author": "LPardue",
@@ -62545,14 +63068,7 @@
           "updatedAt": "2020-05-04T13:52:00Z"
         }
       ],
-      "reviews": [],
-      "baseRepository": "httpwg/http-extensions",
-      "baseRefName": "master",
-      "baseRefOid": "f40438f4582d1fdb5b894f382ce341686e38e7c3",
-      "headRepository": "httpwg/http-extensions",
-      "headRefName": "initial-priority-frame",
-      "headRefOid": "02ca4f3eccaf5d116b17eb501c9d5c92cc6073d0",
-      "mergeCommit": null
+      "reviews": []
     },
     {
       "number": 1169,
@@ -63193,28 +63709,52 @@
       "id": "MDExOlB1bGxSZXF1ZXN0NDI1OTQ4MzU2",
       "title": "Fix __Host prefix example wording",
       "url": "https://github.com/httpwg/http-extensions/pull/1212",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "danielgustafsson",
-      "authorAssociation": "FIRST_TIME_CONTRIBUTOR",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [
         "6265bis"
       ],
       "body": "Add what seems to be a missing word in the __Host example text.",
       "createdAt": "2020-06-01T12:27:14Z",
-      "updatedAt": "2020-06-01T13:27:29Z",
+      "updatedAt": "2020-07-31T21:22:48Z",
       "baseRepository": "httpwg/http-extensions",
       "baseRefName": "master",
       "baseRefOid": "d522c9ba75d7ac355c122276f5d801111cfc1fc0",
       "headRepository": "danielgustafsson/http-extensions",
       "headRefName": "dg-tyops",
       "headRefOid": "abe35eed1f31a59055c059933d3ca70dfe6ba910",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "closedAt": "2020-07-24T06:56:07Z",
+      "mergedAt": "2020-07-24T06:56:07Z",
+      "mergedBy": "mikewest",
+      "mergeCommit": {
+        "oid": "a01b9d4abb116685fdad1061fd2f7ce6335c0748"
+      },
+      "comments": [
+        {
+          "author": "danielgustafsson",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Thanks!",
+          "createdAt": "2020-07-31T21:22:48Z",
+          "updatedAt": "2020-07-31T21:22:48Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDU0NjY3NjQw",
+          "commit": {
+            "abbreviatedOid": "abe35ee"
+          },
+          "author": "mikewest",
+          "authorAssociation": "MEMBER",
+          "state": "APPROVED",
+          "body": "Thank you!",
+          "createdAt": "2020-07-24T06:56:01Z",
+          "updatedAt": "2020-07-24T06:56:01Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 1213,
@@ -63755,6 +64295,177 @@
           "createdAt": "2020-07-12T23:53:21Z",
           "updatedAt": "2020-07-12T23:53:21Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 1235,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDU2NTI1OTAz",
+      "title": "Incorporating WG feedback",
+      "url": "https://github.com/httpwg/http-extensions/pull/1235",
+      "state": "OPEN",
+      "author": "richanna",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- Strengthened requirement for content identifiers for header fields to be lower-case (changed from SHOULD to MUST).\r\n- Relaxed guidance on processing Creation Time and Expiration Time to only require verifiers to examine them and test against the verifier\u2019s requirements.\r\n- Minor editorial corrections and readability improvements.\r\n\r\nResolves #1187, resolves #1188 ",
+      "createdAt": "2020-07-24T23:14:24Z",
+      "updatedAt": "2020-07-24T23:14:24Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "a01b9d4abb116685fdad1061fd2f7ce6335c0748",
+      "headRepository": "richanna/http-extensions",
+      "headRefName": "master",
+      "headRefOid": "b60a4cd176db43f41b25a6c76483914d54324af4",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 1236,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDU3MjE3NjA3",
+      "title": "Move empty cookie-name and empty cookie-value check from 5.3 to 5.4",
+      "url": "https://github.com/httpwg/http-extensions/pull/1236",
+      "state": "MERGED",
+      "author": "DCtheTall",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes [#1234](https://github.com/httpwg/http-extensions/issues/1234).",
+      "createdAt": "2020-07-27T14:55:35Z",
+      "updatedAt": "2020-07-28T15:41:17Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "a01b9d4abb116685fdad1061fd2f7ce6335c0748",
+      "headRepository": null,
+      "headRefName": "empty-name-empty-value",
+      "headRefOid": "84f3551a2502c3c2b8c8f2232468e6565ca1d534",
+      "closedAt": "2020-07-28T15:41:17Z",
+      "mergedAt": "2020-07-28T15:41:17Z",
+      "mergedBy": "mikewest",
+      "mergeCommit": {
+        "oid": "05573367e5f6cadf776afde48e137e2eacf477f7"
+      },
+      "comments": [
+        {
+          "author": "DCtheTall",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> a changelog entry in a new -07 section\r\n\r\nDone",
+          "createdAt": "2020-07-28T15:22:35Z",
+          "updatedAt": "2020-07-28T15:22:35Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDU2NzM4NjMz",
+          "commit": {
+            "abbreviatedOid": "9ce873b"
+          },
+          "author": "mikewest",
+          "authorAssociation": "MEMBER",
+          "state": "APPROVED",
+          "body": "LGTM % a changelog entry in a new -07 section like https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-06#appendix-A.7. Thanks!",
+          "createdAt": "2020-07-28T15:14:07Z",
+          "updatedAt": "2020-07-28T15:14:07Z",
+          "comments": []
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDU2NzU1Mjkw",
+          "commit": {
+            "abbreviatedOid": "fa08d65"
+          },
+          "author": "mikewest",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "Minor change so that we won't break \"links\" if ordering changes, and to explain the change.",
+          "createdAt": "2020-07-28T15:31:52Z",
+          "updatedAt": "2020-07-28T15:32:18Z",
+          "comments": [
+            {
+              "originalPosition": 145,
+              "body": "```suggestion\r\n*  Moved instruction to ignore cookies with empty cookie-name and cookie-value\r\n   from {{set-cookie}} to {{storage-model}} to ensure that they apply to cookies\r\n   created without parsing a cookie string.\r\n```",
+              "createdAt": "2020-07-28T15:31:52Z",
+              "updatedAt": "2020-07-28T15:38:54Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDU2NzU3NzU0",
+          "commit": {
+            "abbreviatedOid": "10f2331"
+          },
+          "author": "DCtheTall",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-07-28T15:34:34Z",
+          "updatedAt": "2020-07-28T15:34:35Z",
+          "comments": [
+            {
+              "originalPosition": 145,
+              "body": "Done.",
+              "createdAt": "2020-07-28T15:34:34Z",
+              "updatedAt": "2020-07-28T15:38:54Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 1239,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDYyNTMxOTQ4",
+      "title": "Collapse TLS errors down to two.",
+      "url": "https://github.com/httpwg/http-extensions/pull/1239",
+      "state": "OPEN",
+      "author": "mnot",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #1227.",
+      "createdAt": "2020-08-04T05:09:34Z",
+      "updatedAt": "2020-08-04T17:36:28Z",
+      "baseRepository": "httpwg/http-extensions",
+      "baseRefName": "master",
+      "baseRefOid": "a8e1cdd7ceeb07c2c078629447e4a0ba10de9a05",
+      "headRepository": "httpwg/http-extensions",
+      "headRefName": "mnot-1227",
+      "headRefOid": "d422fa7570a6461f91dd95583141b78981fa9f7c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "mnot",
+          "authorAssociation": "MEMBER",
+          "body": "PTAL @PiotrSikora @sleevi @davidben ",
+          "createdAt": "2020-08-04T05:10:39Z",
+          "updatedAt": "2020-08-04T05:10:39Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDYxMDI3ODM1",
+          "commit": {
+            "abbreviatedOid": "d422fa7"
+          },
+          "author": "sleevi",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-08-04T17:36:27Z",
+          "updatedAt": "2020-08-04T17:36:28Z",
+          "comments": [
+            {
+              "originalPosition": 40,
+              "body": "So in looking in context, this error stands out as being the only one that explicitly mentions `details`, which might cause some confusion. For example, `http_protocol_error` doesn't mention `details`, yet you use so as part of the illustrative example.\r\n\r\nFor what it's worth, you *could* split this into two: `tls_protocol_error` and `tls_certificate_error`. The former indicates something went wrong with the TLS protocol (which could include both handshake and ongoing use), while the latter indicates an error while verifying the certificate (for which `details` is useful). Similar to `http_protocol_error`, it serves as both the fallback (e.g. if the proxy doesn't expose certificate errors distinct from TLS errors and treats them just as handshake errors) and as a distinct state (errors sending that may not result in a peer alert - e.g. if it receives a malformed message *from* the peer)",
+              "createdAt": "2020-08-04T17:36:28Z",
+              "updatedAt": "2020-08-04T17:36:28Z"
+            }
+          ]
         }
       ]
     }
